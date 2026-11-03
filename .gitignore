@@ -1,5 +1,10 @@
-node_modules
-
-/build
+node_modules/
+/build/
+/.react-router/
+/.vercel/
+/coverage/
+*.tsbuildinfo
 .env
-.vercel
+.env.*
+.DS_Store
+mise.local.toml

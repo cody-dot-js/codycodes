@@ -1,0 +1,205 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "import",
+    "jsdoc",
+    "jsx-a11y",
+    "node",
+    "oxc",
+    "promise",
+    "react",
+    "react-perf",
+    "typescript",
+    "unicorn",
+    "vitest"
+  ],
+  // Why a local plugin: these conventions have no built-in rule. See scripts/oxlint-plugin.js.
+  "jsPlugins": ["./scripts/oxlint-plugin.js"],
+  // Why every category: each rule is on unless a rule below turns it off with a reason. A new
+  // oxlint version turns its new rules on too, and the bump shows what they flag.
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "pedantic": "error",
+    "perf": "error",
+    "restriction": "error",
+    "style": "error"
+  },
+  "ignorePatterns": ["build", ".react-router", "node_modules"],
+  "rules": {
+    "codycodes/descriptive-names": "error",
+    "codycodes/img-dimensions": "error",
+    "codycodes/multiline-exports": "error",
+    "codycodes/no-barrel-files": "error",
+    "codycodes/no-boolean-positional-param": "error",
+    "codycodes/no-jsx-null-ternary": "error",
+    "codycodes/no-react-hooks-suppression": "error",
+    "codycodes/prefer-function-declaration": "error",
+    "codycodes/prefer-null-check": "error",
+    "codycodes/prefer-type-alias": "error",
+    "codycodes/prefer-url-parse": "error",
+    "codycodes/require-suppression-reason": "error",
+
+    // Options that match the code's idioms.
+    "eqeqeq": ["error", "always", { "null": "never" }],
+    "eslint/max-params": ["error", { "max": 3 }],
+    "eslint/no-use-before-define": ["error", { "functions": false }],
+    // Why: destructuring into a variable that exists needs parentheses, which read worse.
+    "eslint/prefer-destructuring": [
+      "error",
+      { "AssignmentExpression": { "array": false, "object": false } }
+    ],
+    // Why: `void promise` marks a promise that `no-floating-promises` lets go on purpose.
+    "eslint/no-void": ["error", { "allowAsStatement": true }],
+    // Why top-level: under `verbatimModuleSyntax`, an import of inline types only stays in the output.
+    "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+    "promise/catch-or-return": ["error", { "allowThen": true, "allowFinally": true }],
+    "eslint/no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
+    "typescript/array-type": ["error", { "default": "array" }],
+    "typescript/consistent-type-definitions": ["error", "type"],
+    // Why: an empty environment value means "not set", so `||` falls back on purpose.
+    "typescript/prefer-nullish-coalescing": ["error", { "ignorePrimitives": { "string": true } }],
+    "typescript/strict-boolean-expressions": ["error", { "allowNullableString": true }],
+    "typescript/switch-exhaustiveness-check": [
+      "error",
+      { "considerDefaultExhaustiveForUnions": true }
+    ],
+    "unicorn/filename-case": ["error", { "case": "kebabCase" }],
+    "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }],
+    // Why these throws: React Router turns a thrown `Response` or `data()` into the error status.
+    "typescript/only-throw-error": [
+      "error",
+      {
+        "allow": [
+          { "from": "lib", "name": "Response" },
+          { "from": "package", "name": "DataWithResponseInit", "package": "react-router" }
+        ]
+      }
+    ],
+    "vitest/consistent-test-it": ["error", { "fn": "it", "withinDescribe": "it" }],
+
+    // Why off: each rule of a pair asks for the opposite of the other. The rule that stays on
+    // matches the code.
+    "import/no-named-export": "off", // `import/no-default-export` stays on
+    "import/prefer-default-export": "off",
+    "vitest/no-importing-vitest-globals": "off", // `vitest/prefer-importing-vitest-globals` stays on
+    "vitest/prefer-called-once": "off", // `vitest/prefer-called-times` stays on
+    "vitest/prefer-to-be-truthy": "off", // `toBe(true)` is stricter
+    "vitest/prefer-to-be-falsy": "off",
+    "eslint/no-eq-null": "off", // `eqeqeq` with `null: "never"` stays on
+    // `typescript/promise-function-async` stays on: an `async` function turns each throw into a
+    // rejection, which a caller such as `Promise.allSettled` needs, with or without an `await`.
+    "typescript/require-await": "off",
+    "eslint/require-await": "off",
+    "typescript/consistent-return": "off", // `noImplicitReturns` in tsconfig.json checks this
+
+    // Why off: these rules are for code that must run before ES2018, or they ban a core part of
+    // TypeScript or Node.js. The site targets evergreen browsers and Node.js 26.
+    "oxc/no-async-await": "off",
+    "oxc/no-optional-chaining": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "import/no-nodejs-modules": "off",
+    "node/no-process-env": "off",
+    "node/no-top-level-await": "off",
+    "eslint/no-ternary": "off",
+    "eslint/no-plusplus": "off",
+    "eslint/init-declarations": "off",
+    "eslint/one-var": "off",
+    "eslint/func-style": "off",
+    "promise/avoid-new": "off",
+
+    // Why off: TypeScript types already state these, and the JSDoc states the contract in prose.
+    "jsdoc/require-param": "off",
+    "jsdoc/require-param-type": "off",
+    "jsdoc/require-returns": "off",
+    "jsdoc/require-returns-type": "off",
+    "jsdoc/require-yields-type": "off",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/prefer-readonly-parameter-types": "off",
+
+    // Why off: oxfmt owns the import order, and object keys follow their meaning, not the alphabet.
+    "eslint/sort-imports": "off",
+    "eslint/sort-keys": "off",
+
+    // Why off: these rules ask for a style that the code does not use.
+    "eslint/capitalized-comments": "off", // a comment can start with a code name, such as `fetch`
+    "import/exports-last": "off", // each export stays next to the code that it exports
+    "import/group-exports": "off",
+    "unicorn/numeric-separators-style": "off", // `1_000` groups a four-digit number on purpose
+    "eslint/no-undefined": "off", // `undefined` is the type of an absent optional value
+    "unicorn/no-null": "off", // Web APIs take `null`, as in `new Response(null)`
+    "react/react-in-jsx-scope": "off", // the automatic JSX runtime imports React
+    "react/jsx-no-literals": "off", // UI copy lives inline in the JSX that renders it (CONVENTIONS.md → React)
+    "react/forbid-component-props": "off", // Tailwind styles each element, `Link` and `NavLink` included
+    "eslint/no-continue": "off", // a `continue` guard at the top of a loop body reads in one pass
+    "typescript/explicit-module-boundary-types": "off", // `typecheck` checks the inferred types
+
+    // Why off: a limit on size or count with no number that fits each file.
+    "eslint/max-lines": "off",
+    "react/jsx-max-depth": "off",
+    "eslint/max-lines-per-function": "off",
+    "eslint/max-statements": "off",
+    "eslint/id-length": "off",
+    "eslint/no-magic-numbers": "off",
+    "import/max-dependencies": "off",
+    "unicorn/max-nested-calls": "off",
+
+    // Why off: the site works this way by design.
+    "node/no-sync": "off", // the sync calls run once, at build time, in the route config
+    "unicorn/import-style": "off", // named imports from `node:path` are the code's style
+
+    // Why off: these rules ask for structure in tests that the tests do not need.
+    "vitest/prefer-expect-assertions": "off",
+    "vitest/require-test-timeout": "off", // `vitest.config.ts` sets the timeout
+    "vitest/prefer-describe-function-title": "off",
+    "vitest/require-top-level-describe": "off",
+    "vitest/no-hooks": "off",
+    "vitest/require-hook": "off",
+    "vitest/no-conditional-in-test": "off" // a condition narrows a type for the assertion
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx"],
+      "rules": {
+        "codycodes/no-config-teardown": "error",
+        "codycodes/no-only-to-be-defined": "error",
+        "codycodes/no-sleep-in-tests": "error",
+        // Why: a stub next to its test reads better than one at module scope.
+        "unicorn/consistent-function-scoping": "off",
+        // Why: a test casts a stub to the type that the code under test takes.
+        "typescript/no-unsafe-type-assertion": "off",
+        // Why: Vitest types its asymmetric matchers, such as `expect.objectContaining`, as `any`.
+        "typescript/no-unsafe-assignment": "off"
+      }
+    },
+    {
+      // Why: oxlint passes AST nodes to a rule untyped, and loads a plugin by its default export.
+      "files": ["scripts/oxlint-plugin.js", "scripts/oxlint-rules/**"],
+      "rules": {
+        "import/no-default-export": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/strict-boolean-expressions": "off"
+      }
+    },
+    {
+      // Why: React Router loads a route module, and the tools load a config, by its default export.
+      "files": ["app/root.tsx", "app/routes.ts", "app/routes/**", "*.config.ts"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    },
+    {
+      // Why: a route module exports `loader` and `meta` next to its component, and the root exports
+      // `Layout`, `App`, and `ErrorBoundary`. React Router owns that contract.
+      "files": ["app/root.tsx", "app/routes/**"],
+      "rules": {
+        "react/only-export-components": "off",
+        "react/no-multi-comp": "off"
+      }
+    }
+  ]
+}

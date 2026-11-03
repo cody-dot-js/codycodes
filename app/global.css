@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/* The abyss brand: the same tokens as the shrimpposting X cards. Dark only, on purpose. */
+@theme {
+	--color-abyss-1: #052430;
+	--color-abyss-2: #02121a;
+	--color-abyss-3: #000406;
+	--color-ink: #fff8f1;
+	--color-blush: #ffb1aa;
+	--color-label: #a9c8d1;
+	--color-teal: #6fffe4;
+	--color-rule: rgb(169 200 209 / 0.16);
+	--color-panel: rgb(5 36 48 / 0.55);
+
+	--font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	--font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@layer base {
+	:root {
+		color-scheme: dark;
+		background: var(--color-abyss-3);
+	}
+
+	body {
+		min-height: 100dvh;
+		background:
+			radial-gradient(
+					120% 70% at 85% 0%,
+					var(--color-abyss-1) 0%,
+					var(--color-abyss-2) 45%,
+					var(--color-abyss-3) 100%
+				)
+				fixed,
+			var(--color-abyss-3);
+		color: var(--color-ink);
+		font-family: var(--font-sans);
+		font-size: 17px;
+		line-height: 1.6;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-teal);
+		outline-offset: 3px;
+		border-radius: 4px;
+	}
+
+	::selection {
+		background: var(--color-blush);
+		color: var(--color-abyss-3);
+	}
+}
+
+/*
+ * Why plain CSS for post bodies: MDX renders bare elements, so one stylesheet styles every post
+ * with no component map. A post imports a component only for what markdown cannot write.
+ */
+.post-body {
+	display: grid;
+	gap: 1.1rem;
+	max-width: 68ch;
+
+	& h2 {
+		margin-top: 1.6rem;
+		font-size: 1.6rem;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		line-height: 1.2;
+		text-wrap: balance;
+	}
+
+	& h3 {
+		margin-top: 1rem;
+		font-size: 1.25rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	& a {
+		color: var(--color-blush);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	& strong {
+		font-weight: 600;
+	}
+
+	& :where(ul, ol) {
+		display: grid;
+		gap: 0.35rem;
+		padding-left: 1.25rem;
+	}
+
+	& ul {
+		list-style: disc;
+	}
+
+	& ol {
+		list-style: decimal;
+	}
+
+	& li::marker {
+		color: var(--color-blush);
+	}
+
+	& blockquote {
+		border-left: 2px solid var(--color-blush);
+		padding-left: 1rem;
+		color: var(--color-label);
+	}
+
+	& :not(pre) > code {
+		font-family: var(--font-mono);
+		font-size: 0.88em;
+		color: var(--color-label);
+	}
+
+	& pre {
+		overflow-x: auto;
+		border-radius: 10px;
+		background: var(--color-panel);
+		padding: 1rem 1.25rem;
+		font-family: var(--font-mono);
+		font-size: 0.88rem;
+		line-height: 1.7;
+	}
+
+	& hr {
+		border-color: var(--color-rule);
+	}
+
+	& table {
+		display: block;
+		overflow-x: auto;
+		border-collapse: collapse;
+		font-size: 0.92rem;
+	}
+
+	& :where(th, td) {
+		border-bottom: 1px solid var(--color-rule);
+		padding: 0.6rem 0.8rem;
+		text-align: left;
+	}
+
+	& th {
+		font-family: var(--font-mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--color-label);
+	}
+}
