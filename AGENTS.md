@@ -1,4 +1,4 @@
-# codyaprice.com agent guide
+# codycod.es agent guide
 
 Cody Price's personal site: MDX posts in the abyss brand, prerendered to static files with React Router 8. One package at the repo root, deployed on Vercel. It moves to `@ngrok/app-server` after that package ships 0.3.0 ([docs/app-server.md](./docs/app-server.md)).
 

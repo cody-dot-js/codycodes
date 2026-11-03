@@ -1,4 +1,4 @@
-# codyaprice.com
+# codycod.es
 
 Cody Price's personal site. Posts are MDX files, and every page is prerendered to static files with React Router 8. The site keeps the dated original of each post; copies on X link back to it.
 
@@ -37,5 +37,5 @@ pnpm run dev
 
 Vercel builds the site with `vercel.json`: `pnpm run build`, then it serves `build/client/` as static files.
 
-- `codyaprice.com` is the production domain.
-- Add `codycod.es` to the same Vercel project as a domain that redirects to `codyaprice.com` (Domains → Redirect to another domain → 308).
+- `codycod.es` is the production domain and the canonical origin (`SITE_ORIGIN` in `app/site.ts`).
+- Add `codyaprice.com` to the same Vercel project as a domain that redirects to `codycod.es` (Domains → Redirect to another domain → 308).

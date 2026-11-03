@@ -13,7 +13,7 @@ export function loader() {
 export const meta: Route.MetaFunction = () =>
 	pageMeta({
 		title: "Posts",
-		description: "Every post on codyaprice.com, newest first.",
+		description: "Every post on codycod.es, newest first.",
 		path: "/posts",
 	});
 

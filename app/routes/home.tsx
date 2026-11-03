@@ -21,7 +21,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 		<div className="grid gap-16">
 			<section className="grid gap-7">
 				<header className="grid gap-3.5">
-					<p className="font-mono text-xs tracking-widest text-label uppercase">codyaprice.com</p>
+					<p className="font-mono text-xs tracking-widest text-label uppercase">codycod.es</p>
 					<h1 className="text-[clamp(2.2rem,6vw,3.4rem)] leading-[1.04] font-semibold tracking-tight text-balance">
 						cody price
 						<br />

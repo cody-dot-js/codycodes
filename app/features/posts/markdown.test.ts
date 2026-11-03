@@ -20,7 +20,7 @@ describe("toMarkdownTwin", () => {
 		const source = `---\ntitle: Hello\n---\n\nimport { BeforeAfter } from "~/components/mdx/before-after.tsx";\n\nHi.\n\n<BeforeAfter label="LCP" before="4 s" after="1 s" />\n`;
 
 		expect(toMarkdownTwin({ post, source })).toBe(
-			`# Hello\n\n> The first post.\n\nPublished 2026-11-03 · frontend, agents · https://codyaprice.com/posts/hello\n\nHi.\n\n<BeforeAfter label="LCP" before="4 s" after="1 s" />\n`,
+			`# Hello\n\n> The first post.\n\nPublished 2026-11-03 · frontend, agents · https://codycod.es/posts/hello\n\nHi.\n\n<BeforeAfter label="LCP" before="4 s" after="1 s" />\n`,
 		);
 	});
 });

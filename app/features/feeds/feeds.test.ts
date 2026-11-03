@@ -28,9 +28,7 @@ describe("rssFeed", () => {
 
 describe("llmsTxt", () => {
 	it("links each post's markdown twin", () => {
-		expect(llmsTxt(posts)).toContain(
-			"(https://codyaprice.com/posts/tags-and-quotes.md): Escape them.",
-		);
+		expect(llmsTxt(posts)).toContain("(https://codycod.es/posts/tags-and-quotes.md): Escape them.");
 	});
 
 	it("says so when there are no posts", () => {
@@ -41,7 +39,7 @@ describe("llmsTxt", () => {
 describe("sitemap", () => {
 	it("uses the update date as `lastmod` when a post has one", () => {
 		expect(sitemap(posts)).toContain(
-			"<loc>https://codyaprice.com/posts/tags-and-quotes</loc><lastmod>2026-11-04</lastmod>",
+			"<loc>https://codycod.es/posts/tags-and-quotes</loc><lastmod>2026-11-04</lastmod>",
 		);
 	});
 });

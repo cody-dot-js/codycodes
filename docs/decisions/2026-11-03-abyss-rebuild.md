@@ -1,4 +1,4 @@
-# Rebuild codyaprice.com as a prerendered MDX site
+# Rebuild codycod.es as a prerendered MDX site
 
 **Date:** 2026-11-03 · **Status:** accepted
 
@@ -8,6 +8,7 @@ codyaprice.com was a 2020 Gatsby site with a bio and 18 old posts. codycod.es wa
 
 ## Decisions
 
+- **codycod.es is the canonical origin.** Every canonical link, feed, sitemap, and twin uses it. codyaprice.com redirects to it with a 308, so old links keep working.
 - **React Router 8, prerendered, with MDX through `@mdx-js/rollup`.** It is the stack of ngrok.com/blog and of `@ngrok/app-server`, so the Vite setup and the move to the server carry over. Astro was the other option: zero JavaScript on a post page by default, but a second framework to keep up.
 - **`ssr: false` until `@ngrok/app-server` 0.3.0.** Every page is known at build time, so the output is static files. [docs/app-server.md](../app-server.md) has the plan for the server.
 - **One route for each post, whose module is the MDX file.** The router loads the post before it renders, so the prerendered HTML has the whole post, and a client navigation loads only that post's chunk. `app/routes.ts` registers them from the folders.

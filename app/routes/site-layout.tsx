@@ -7,7 +7,7 @@ export default function SiteLayout() {
 		<div className="mx-auto grid min-h-dvh max-w-[920px] grid-rows-[auto_1fr_auto] gap-12 px-[max(16px,env(safe-area-inset-left))] py-8">
 			<header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
 				<Link to="/" className="font-mono text-sm tracking-wide text-ink">
-					codyaprice.com
+					codycod.es
 				</Link>
 				<nav aria-label="Main" className="flex gap-5 font-mono text-sm text-label">
 					{/* Why NavLink: it sets `aria-current="page"`, which the class reads. */}

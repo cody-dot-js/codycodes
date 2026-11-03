@@ -20,7 +20,7 @@ export function loader({ params }: Route.LoaderArgs) {
 export const meta: Route.MetaFunction = ({ loaderData }) =>
 	pageMeta({
 		title: `${loaderData.tag} posts`,
-		description: `Posts on codyaprice.com tagged ${loaderData.tag}, newest first.`,
+		description: `Posts on codycod.es tagged ${loaderData.tag}, newest first.`,
 		path: `/posts/tags/${loaderData.tag}`,
 	});
 

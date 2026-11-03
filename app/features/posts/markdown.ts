@@ -12,7 +12,7 @@ const MDX_IMPORT = /^import\s.+\sfrom\s+["'][^"']+["'];?\n/gmu;
  *
  * @example
  * toMarkdownTwin({ post, source: "---\ntitle: Hello\n---\nHi." });
- * // => "# Hello\n\n> The description.\n\nPublished 2026-11-03 · frontend · https://codyaprice.com/posts/hello\n\nHi.\n"
+ * // => "# Hello\n\n> The description.\n\nPublished 2026-11-03 · frontend · https://codycod.es/posts/hello\n\nHi.\n"
  */
 export function toMarkdownTwin({ post, source }: { post: Post; source: string }) {
 	const body = source.replace(FRONTMATTER, "").replaceAll(MDX_IMPORT, "").trim();
