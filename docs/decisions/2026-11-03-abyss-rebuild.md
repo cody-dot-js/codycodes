@@ -15,6 +15,7 @@ codyaprice.com was a 2020 Gatsby site with a bio and 18 old posts. codycod.es wa
 - **Frontmatter through Zod, parsed once at build time.** A bad post stops the build with the file and the field. Tags are a closed list, so a typo cannot make a new tag page.
 - **Start clean.** The 2020 posts do not move. `/blog/*` redirects to `/posts`, so an old link lands on a real page.
 - **The abyss brand, dark only.** The tokens match the shrimpposting X cards, so a reader sees one brand from the timeline to the site. Geist and JetBrains Mono are self-hosted, so no page waits on a font host.
+- **The dither ocean from the moving X cards runs along the bottom of each page.** It uses the same 8×8 Bayer pattern, dot pitch, and three swells as `waves.js` in the shrimpposting skill, on a 2D canvas at 15 frames a second. One frame takes 0.62 ms to compute at 1440 px wide (median of 200 runs, Node 26, Apple silicon). With reduced motion, it draws one still frame.
 - **The shrimp tank hero loads after the first paint.** three.js is 139 kB gzip (from `pnpm run build`, the `scene` chunk). It loads in its own chunk from an effect, and the tank keeps its size, so the load moves nothing.
 - **A markdown twin for each post, and `llms.txt`.** Agents that fetch a post get its source at `/posts/<slug>.md`. The cost is one prerendered file for each post.
 - **Agent-first repo rules** from the app-server, mantle, and frontend repos: `AGENTS.md`, `CONVENTIONS.md`, the principles, every oxlint category on, strict TypeScript, and a hook that lints each edit.

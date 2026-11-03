@@ -25,6 +25,7 @@
 	body {
 		min-height: 100dvh;
 		background:
+			radial-gradient(900px 520px at 78% 112%, rgb(92 242 214 / 0.1), transparent 70%) fixed,
 			radial-gradient(
 					120% 70% at 85% 0%,
 					var(--color-abyss-1) 0%,
