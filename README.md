@@ -1,38 +1,41 @@
-# Remix
+# codycod.es
 
-This directory is a brief example of a [Remix](https://remix.run/docs) site that can be deployed to Vercel with zero configuration.
+Cody Price's personal site. Posts are MDX files, and every page is prerendered to static files with React Router 8. The site keeps the dated original of each post; copies on X link back to it.
 
-To get started, run the Remix cli with this template
+Agents: start at [AGENTS.md](./AGENTS.md).
 
-```sh
-npx create-remix@latest --template vercel/vercel/examples/remix
-```
+## Setup
 
-## Deploy Your Own
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/vercel/tree/main/examples/remix&template=remix)
-
-_Live Example: https://remix-run-template.vercel.app_
-
-You can also deploy using the [Vercel CLI](https://vercel.com/docs/cli):
+The repo pins Node and pnpm with [mise](https://mise.jdx.dev). `./scripts/install-mise` installs mise if you do not have it.
 
 ```sh
-npm i -g vercel
-vercel
+mise install
+pnpm install
+pnpm run dev
 ```
 
-## Development
+## Commands
 
-To run your Remix app locally, make sure your project's local dependencies are installed:
+| Command            | What it does                                        |
+| ------------------ | --------------------------------------------------- |
+| `pnpm run dev`     | The dev server, with drafts from `content/drafts/`  |
+| `pnpm run build`   | Prerenders every page into `build/client/`          |
+| `pnpm run preview` | Serves `build/client/` the way the static host does |
+| `pnpm run check`   | Format check, lint, typecheck, and tests            |
+| `pnpm run fmt`     | Formats every file with oxfmt                       |
 
-```sh
-npm install
-```
+## Layout
 
-Afterwards, start the Remix development server like so:
+- `content/posts/<slug>/post.mdx`: one post. [content/AGENTS.md](./content/AGENTS.md) has the guide.
+- `app/features/posts/`: the frontmatter contract, the post index, and the markdown twin.
+- `app/features/feeds/`: `rss.xml`, `sitemap.xml`, and `llms.txt`.
+- `app/features/shrimp-tank/`: the 3D shrimp on the home page.
+- `app/redirects.ts`: the one redirect table.
+- `docs/`: the principles, the decisions, and the [move to `@ngrok/app-server`](./docs/app-server.md).
 
-```sh
-npm run dev
-```
+## Deploy
 
-Open up [http://localhost:5173](http://localhost:5173) and you should be ready to go!
+Vercel builds the site with `vercel.json`: `pnpm run build`, then it serves `build/client/` as static files.
+
+- `codycod.es` is the production domain and the canonical origin (`SITE_ORIGIN` in `app/site.ts`).
+- Add `codyaprice.com` to the same Vercel project as a domain that redirects to `codycod.es` (Domains → Redirect to another domain → 308).

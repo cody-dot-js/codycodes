@@ -1,0 +1,32 @@
+---
+title: Kit check
+description: A draft that shows each part of the post kit. Only the dev server builds it.
+date: 2026-11-03
+tags:
+  - frontend
+---
+
+import { BeforeAfter } from "~/components/mdx/before-after.tsx";
+
+This draft exists to show the post kit. Production builds skip `content/drafts/`.
+
+## Markdown
+
+Body text, **strong text**, `inline code`, and [a link](https://ngrok.com).
+
+- A list item
+- Another one
+
+> A quote from someone with receipts.
+
+```ts
+const lcp = await measure({ page: "/", device: "moto-g-power" });
+```
+
+| Metric | Before | After |
+| ------ | ------ | ----- |
+| LCP    | 4.1 s  | 1.3 s |
+
+## Components
+
+<BeforeAfter label="LCP on a 4G phone" before="4.1 s" after="1.3 s" />
