@@ -1,3 +1,5 @@
+import { getAudio } from "~/features/sound/sound.ts";
+
 /** How long one nug walk lasts, in milliseconds. `nug-walk` in `global.css` uses the same time. */
 export const NUG_WALK_MS = 2400;
 
@@ -15,25 +17,6 @@ const PATTERN = {
 	hat: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13 + 1 / 3, 13 + 2 / 3, 14, 15],
 } as const;
 
-/** The volume of the whole beat, from 0 to 1. A pet is not a reason to be loud. */
-const VOLUME = 0.25;
-
-let audio: { context: AudioContext; noise: AudioBuffer } | null = null;
-
-/** The audio context and one second of white noise for the clap and the hats, made on the first walk. */
-function getAudio() {
-	if (audio == null) {
-		const context = new AudioContext();
-		const noise = context.createBuffer(1, context.sampleRate, context.sampleRate);
-		const samples = noise.getChannelData(0);
-		for (let index = 0; index < samples.length; index++) {
-			samples[index] = Math.random() * 2 - 1;
-		}
-		audio = { context, noise };
-	}
-	return audio;
-}
-
 /** An 808 kick: a sine that drops from 140 Hz to 42 Hz and fades out. */
 function kick(context: AudioContext, output: AudioNode, time: number) {
 	const oscillator = context.createOscillator();
@@ -49,6 +32,7 @@ function kick(context: AudioContext, output: AudioNode, time: number) {
 
 /** A burst of filtered noise: a clap with a band-pass filter, a hat with a high-pass filter. */
 function noiseHit({
+	audio: { context, noise },
 	output,
 	time,
 	filter,
@@ -56,6 +40,7 @@ function noiseHit({
 	level,
 	length,
 }: {
+	audio: { context: AudioContext; noise: AudioBuffer };
 	output: AudioNode;
 	time: number;
 	filter: BiquadFilterType;
@@ -63,7 +48,6 @@ function noiseHit({
 	level: number;
 	length: number;
 }) {
-	const { context, noise } = getAudio();
 	const source = context.createBufferSource();
 	const shape = context.createBiquadFilter();
 	const gain = context.createGain();
@@ -86,20 +70,22 @@ function noiseHit({
  * playNugBeat(); // an 808, two claps, and a hat roll, for 2.4 s
  */
 export function playNugBeat() {
-	if (typeof AudioContext === "undefined") {
+	const audio = getAudio();
+	if (audio == null) {
 		return;
 	}
-	const { context } = getAudio();
-	void context.resume();
+	const { context } = audio;
+	// Why under the site volume: the beat is a little quieter than one at full level, so it sits under the pops.
 	const output = context.createGain();
-	output.gain.value = VOLUME;
-	output.connect(context.destination);
+	output.gain.value = 0.8;
+	output.connect(audio.output);
 	const start = context.currentTime + 0.02;
 	for (const step of PATTERN.kick) {
 		kick(context, output, start + step * STEP);
 	}
 	for (const step of PATTERN.clap) {
 		noiseHit({
+			audio,
 			output,
 			time: start + step * STEP,
 			filter: "bandpass",
@@ -110,6 +96,7 @@ export function playNugBeat() {
 	}
 	for (const step of PATTERN.hat) {
 		noiseHit({
+			audio,
 			output,
 			time: start + step * STEP,
 			filter: "highpass",

@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 
+import { playSound } from "~/features/sound/sound.ts";
+
 /** How many small bubbles drift up from a footnote mark when a reader comes back to it. */
 const BUBBLES = 5;
 /** How long the pop and the bubbles last, in milliseconds. The CSS animations end inside it. */
@@ -9,18 +11,21 @@ const SCROLL_FALLBACK_MS = 450;
 
 /**
  * Pops a bubble around a footnote mark, then lets small dotted bubbles drift up
- * from it, like the 3D shrimp's. The spans live inside the mark, so they move
- * with it while the page scrolls.
+ * from it, like the 3D shrimp's. Each bubble blips as it shows. The spans live
+ * inside the mark, so they move with it while the page scrolls.
  */
 function bubbleUp(mark: HTMLElement) {
 	const spans = [document.createElement("span")];
 	spans[0]?.classList.add("footnote-pop");
+	playSound("pop");
 	for (let index = 0; index < BUBBLES; index++) {
 		const bubble = document.createElement("span");
+		const delayMs = 120 + index * 110;
 		bubble.className = "footnote-bubble";
 		bubble.style.setProperty("--drift", `${(Math.random() - 0.5) * 18}px`);
 		bubble.style.setProperty("--size", `${4 + Math.random() * 5}px`);
-		bubble.style.setProperty("--delay", `${120 + index * 110}ms`);
+		bubble.style.setProperty("--delay", `${delayMs}ms`);
+		playSound("bubble", { delayMs });
 		spans.push(bubble);
 	}
 	for (const span of spans) {
@@ -64,11 +69,12 @@ function afterScroll(then: () => void) {
 }
 
 /**
- * The motion of footnotes on a page. A jump to a note rings it (in CSS, from
- * `:target`). A jump back to a footnote mark pops a bubble around it, and
- * small bubbles drift up. A second tap on the same link replays the motion,
- * because the URL does not change. With reduced motion, only the CSS rings
- * and underlines show. It renders nothing.
+ * The motion and the sound of footnotes on a page. A jump to a note plays a
+ * drop and rings the note (in CSS, from `:target`). A jump back to a footnote
+ * mark pops a bubble around it, and small bubbles drift up and blip. A second
+ * tap on the same link replays the motion, because the URL does not change.
+ * With reduced motion, only the CSS rings, the underlines, and the drop show.
+ * It renders nothing.
  *
  * @example
  * <FootnoteMotion />
@@ -94,6 +100,9 @@ export function FootnoteMotion() {
 				event.target instanceof Element
 					? event.target.closest("a[data-footnote-ref], a[data-footnote-backref]")
 					: null;
+			if (link?.matches("[data-footnote-ref]") === true) {
+				playSound("drop");
+			}
 			if (link?.getAttribute("href") === location.hash) {
 				replay(hashTarget(location.hash));
 				arrive();

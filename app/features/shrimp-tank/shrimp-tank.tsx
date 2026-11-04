@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import { playSound } from "~/features/sound/sound.ts";
+
 import { lineAfter } from "./lines.ts";
 import { SpeechBubble } from "./speech-bubble.tsx";
 import { SpeechTail } from "./speech-tail.tsx";
@@ -9,12 +11,16 @@ async function loadScene() {
 	return import("./scene.ts");
 }
 
+/** When each bubble of a pet blips, in milliseconds after the click: a quick, uneven run of three. */
+const PET_BUBBLE_MS = [0, 70, 160];
+
 /** The tank's state: three.js loads, then the scene runs or the browser has no WebGL. */
 type TankStatus = "loading" | "ready" | "no-webgl";
 
 /**
  * The shrimp. A pet (a click on him, or Enter or Space on the focused tank)
- * makes him squint, float hearts, swim a happy lap, and say a new line. He
+ * makes him squint, float hearts, swim a happy lap, say a new line, and blip
+ * three bubbles. He
  * swims toward a near cursor. three.js loads in its own chunk after the first
  * paint, and the tank keeps its size the whole time, so the load moves nothing.
  *
@@ -57,7 +63,15 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 			if (unmounted) {
 				return;
 			}
-			const scene = sceneModule.mountShrimpTank({ ...target, onPet: setPets });
+			const scene = sceneModule.mountShrimpTank({
+				...target,
+				onPet: (count) => {
+					setPets(count);
+					for (const delayMs of PET_BUBBLE_MS) {
+						playSound("bubble", { delayMs });
+					}
+				},
+			});
 			dispose = scene?.dispose;
 			setStatus(scene == null ? "no-webgl" : "ready");
 		}

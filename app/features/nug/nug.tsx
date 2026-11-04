@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { BAYER_4, HEART } from "~/features/dither/dither.ts";
 
+import { playSound } from "~/features/sound/sound.ts";
+
 import { NUG_WALK_MS, playNugBeat } from "./beat.ts";
 
 import calm176 from "./nug-calm-176.png";
@@ -52,7 +54,8 @@ function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: numb
 /**
  * Nug: the shrimp in the ngrok hoodie, dithered in the site's shell and abyss
  * colors. A pet (a click, or Enter on the focused button) shuts his eyes in a
- * happy `^ ^` and floats a pixel heart up from his thumb. Both faces are in
+ * happy `^ ^`, floats a pixel heart up from his thumb, and plays two soft
+ * notes. Both faces are in
  * the HTML, so the first pet shows at once. The heart's cells are 2 CSS px, as
  * the 3D shrimp's are, so its canvas holds half his size. Three quick pets
  * start the nug walk, his plug walk: he bounces on each beat, shuffles, swings
@@ -106,6 +109,7 @@ export function Nug({ size, className }: { size: 88 | 176; className: string }) 
 	const pet = useCallback(() => {
 		const now = performance.now();
 		pets.current.push(now);
+		playSound("pet");
 		// Why only the third: more pets during the walk do not start it again.
 		if (pets.current.length === NUG_WALK_PETS) {
 			walkStart.current = now;
