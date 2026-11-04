@@ -35,6 +35,18 @@ In the right-hand column, try these:
   a copy of it. mantle is [open source](https://github.com/ngrok/mantle) under the MIT license.
 </Btw>
 
+## Long URLs, without the tricks
+
+Long URLs have caused problems in the ngrok dashboard for years. The usual fixes all give something up. Break a URL into pieces, or drop characters until it fits, and the page shows something that isn't the real value anymore.
+
+`TruncatedText` only changes how the value looks. The middle ellipsis is presentation, and the full value is still there:
+
+- Hover or focus a clipped URL, and a tooltip shows all of it.
+- One click selects the whole value, not only the part you can see.
+- A copy gets the full URL, every time.
+
+For us, it's the first answer to long URLs that doesn't feel like a hack.
+
 ## Use it
 
 IDs aren't the only values that differ at the end. In each pair below, only the end changes:
