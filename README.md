@@ -1,4 +1,4 @@
-# codycod.es
+# codydotjs.dev
 
 Cody Price's personal site. Posts are MDX files. React Router 8 prerenders each known page, and [`@ngrok/app-server`](https://github.com/ngrok/app-server) serves the site. The site keeps the dated original of each post; copies on X link back to it.
 
@@ -38,5 +38,5 @@ pnpm run dev
 
 Vercel runs `pnpm run build`. With `VERCEL=1`, the `vercel` host of `@ngrok/app-server` writes `.vercel/output`: one function for the pages, and the CDN for `/assets/`.
 
-- `codycod.es` is the production domain and the canonical origin (`SITE_ORIGIN` in `app/site.ts`).
-- Add `codyaprice.com` to the same Vercel project as a domain that redirects to `codycod.es` (Domains → Redirect to another domain → 308).
+- `codydotjs.dev` is the production domain and the canonical origin (`SITE_ORIGIN` in `app/site.ts`).
+- Add `codyaprice.com` to the same Vercel project as a domain that redirects to `codydotjs.dev` (Domains → Redirect to another domain → 308).

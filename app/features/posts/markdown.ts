@@ -105,7 +105,7 @@ const COMPONENTS: Record<string, (node: MdxJsxFlowElement) => TwinContent[]> = {
  *
  * @example
  * toMarkdownTwin({ post, source: "---\ntitle: Hello\n---\nHi." });
- * // => "# Hello\n\n> The description.\n\nPublished 2026-11-03 · frontend · https://codycod.es/posts/hello\n\nHi.\n"
+ * // => "# Hello\n\n> The description.\n\nPublished 2026-11-03 · frontend · https://codydotjs.dev/posts/hello\n\nHi.\n"
  */
 export function toMarkdownTwin({ post, source }: { post: Post; source: string }) {
 	const tree = unified()

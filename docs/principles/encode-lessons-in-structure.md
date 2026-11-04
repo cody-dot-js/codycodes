@@ -14,7 +14,7 @@ When a mistake recurs, turn the lesson into a lint rule, a type, a schema, a tes
 
 **In this repo:**
 
-- The custom oxlint rules in [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/), such as `codycodes/img-dimensions`.
+- The custom oxlint rules in [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/), such as `codydotjs/img-dimensions`.
 - [`app/features/posts/schema.ts`](../../app/features/posts/schema.ts), which turns a frontmatter rule into a build failure.
 - [`server.ts`](../../server.ts), which sets the CSP and the security headers on each response, so no page can leave them out.
 - [`docs/decisions/`](../decisions/) records the reason for a choice that no check can hold.

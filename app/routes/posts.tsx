@@ -14,7 +14,7 @@ export function loader() {
 export const meta: Route.MetaFunction = ({ loaderData }) =>
 	pageMeta({
 		title: "Posts",
-		description: "Every post on codycod.es, newest first.",
+		description: "Every post on codydotjs.dev, newest first.",
 		path: "/posts",
 		pageType: "CollectionPage",
 		crumbs: [{ name: "Posts", path: "/posts" }],

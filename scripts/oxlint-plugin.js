@@ -17,7 +17,7 @@ import requireSuppressionReason from "./oxlint-rules/require-suppression-reason.
 import testAssertions from "./oxlint-rules/test-assertions.js";
 
 const plugin = {
-	meta: { name: "codycodes" },
+	meta: { name: "codydotjs" },
 	rules: {
 		...descriptiveNames,
 		...imgDimensions.rules,

@@ -21,7 +21,7 @@ export type Crumb = { name: string; path: string };
  * Cody, the author and publisher of every page.
  *
  * @example
- * personJsonLd(); // => { "@type": "Person", "@id": "https://codycod.es/#person", name: "Cody Price", ... }
+ * personJsonLd(); // => { "@type": "Person", "@id": "https://codydotjs.dev/#person", name: "Cody Price", ... }
  */
 export function personJsonLd(): JsonLd {
 	return {
@@ -42,13 +42,13 @@ export function personJsonLd(): JsonLd {
  * The site.
  *
  * @example
- * websiteJsonLd(); // => { "@type": "WebSite", "@id": "https://codycod.es/#website", ... }
+ * websiteJsonLd(); // => { "@type": "WebSite", "@id": "https://codydotjs.dev/#website", ... }
  */
 export function websiteJsonLd(): JsonLd {
 	return {
 		"@type": "WebSite",
 		"@id": IDS.website,
-		name: "codycod.es",
+		name: "codydotjs.dev",
 		alternateName: SITE_NAME,
 		description: SITE_DESCRIPTION,
 		url: absoluteUrl("/"),
@@ -165,7 +165,7 @@ export function postListJsonLd(posts: Pick<Post, "title" | "href" | "date">[]): 
  * One post, with its image, its loop, its dates, and its word count.
  *
  * @example
- * blogPostingJsonLd({ post, wordCount: 900, image: "https://codycod.es/og.jpg" });
+ * blogPostingJsonLd({ post, wordCount: 900, image: "https://codydotjs.dev/og.jpg" });
  */
 export function blogPostingJsonLd({
 	post,

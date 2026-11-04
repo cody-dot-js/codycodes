@@ -1,4 +1,4 @@
-# codycod.es agent guide
+# codydotjs.dev agent guide
 
 Cody Price's personal site: MDX posts in the abyss brand, built with React Router 8 and served by [`@ngrok/app-server`](https://github.com/ngrok/app-server). The build prerenders each known page. One package at the repo root, deployed on Vercel.
 

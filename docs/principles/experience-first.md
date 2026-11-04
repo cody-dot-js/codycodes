@@ -20,4 +20,4 @@ Judge a change by what the people on the other side get: the reader of a post, t
 - [`app/features/shrimp-tank/`](../../app/features/shrimp-tank/) loads three.js in a lazy chunk after the first paint.
 - [CONVENTIONS.md § Performance](../../CONVENTIONS.md#performance) and [CONVENTIONS.md § Content](../../CONVENTIONS.md#content).
 
-**Enforced by:** `codycodes/img-dimensions` in [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/); review and [prove it works](./prove-it-works.md) for the rest. No lint measures layout shift.
+**Enforced by:** `codydotjs/img-dimensions` in [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/); review and [prove it works](./prove-it-works.md) for the rest. No lint measures layout shift.

@@ -21,7 +21,7 @@ describe("toMarkdownTwin", () => {
 		const source = `---\ntitle: Hello\n---\n\nimport { NugSays } from "~/components/mdx/nug-says.tsx";\n\nHi.\n`;
 
 		expect(toMarkdownTwin({ post, source })).toBe(
-			`# Hello\n\n> The first post.\n\nPublished 2026-11-03 · frontend, agents · https://codycod.es/posts/hello\n\nHi.\n`,
+			`# Hello\n\n> The first post.\n\nPublished 2026-11-03 · frontend, agents · https://codydotjs.dev/posts/hello\n\nHi.\n`,
 		);
 	});
 
@@ -29,7 +29,7 @@ describe("toMarkdownTwin", () => {
 		const source = `<LiveDemo src="/posts/hello/demo" title="Three IDs" height={162} />\n\n<NugSays>\n  mantle is [open source](https://github.com/ngrok/mantle).\n</NugSays>\n\n<BeforeAfter label="LCP" before="4 s" after="1 s" />\n\n<NgrokCta title="See it in ngrok">\n  Every ID keeps its tail.\n</NgrokCta>\n`;
 
 		expect(toMarkdownTwin({ post, source })).toContain(
-			`[Live demo: Three IDs](https://codycod.es/posts/hello/demo)\n\n> mantle is [open source](https://github.com/ngrok/mantle).\n\nLCP: 4 s → 1 s\n\n**See it in ngrok**\n\nEvery ID keeps its tail.\n\n[Open the dashboard](https://dashboard.ngrok.com/) or [sign up for free](https://dashboard.ngrok.com/signup).\n`,
+			`[Live demo: Three IDs](https://codydotjs.dev/posts/hello/demo)\n\n> mantle is [open source](https://github.com/ngrok/mantle).\n\nLCP: 4 s → 1 s\n\n**See it in ngrok**\n\nEvery ID keeps its tail.\n\n[Open the dashboard](https://dashboard.ngrok.com/) or [sign up for free](https://dashboard.ngrok.com/signup).\n`,
 		);
 	});
 

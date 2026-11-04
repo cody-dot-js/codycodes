@@ -11,7 +11,7 @@ package_manager="$(awk -F'"' '$2 == "packageManager" { print $4; exit }' "${repo
 case "${package_manager}" in
 	pnpm@*) printf '%s\n' "${package_manager#pnpm@}" ;;
 	*)
-		echo "codycodes: expected package.json#packageManager to be pnpm@<version>, got ${package_manager:-<missing>}" >&2
+		echo "codydotjs: expected package.json#packageManager to be pnpm@<version>, got ${package_manager:-<missing>}" >&2
 		exit 1
 		;;
 esac

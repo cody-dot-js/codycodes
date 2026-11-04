@@ -19,7 +19,7 @@ describe("pageMeta", () => {
 			pageType: "CollectionPage",
 		});
 
-		expect(find(tags, "property", "og:image")?.content).toBe("https://codycod.es/og.jpg");
+		expect(find(tags, "property", "og:image")?.content).toBe("https://codydotjs.dev/og.jpg");
 		expect(find(tags, "name", "robots")?.content).toContain("max-image-preview:large");
 		const script = tags.find((tag) => "script:ld+json" in tag) as
 			| { "script:ld+json": { "@graph": { "@type": string }[] } }

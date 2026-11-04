@@ -10,7 +10,7 @@ const oxlintPath = join(import.meta.dirname, "..", "node_modules", ".bin", "oxli
 let rootDirectory = "";
 
 beforeEach(() => {
-	rootDirectory = mkdtempSync(join(tmpdir(), "codycodes-oxlint-plugin-"));
+	rootDirectory = mkdtempSync(join(tmpdir(), "codydotjs-oxlint-plugin-"));
 	return () => {
 		rmSync(rootDirectory, { recursive: true, force: true });
 	};
@@ -25,7 +25,7 @@ function writeFixture({ rule, source, fileName = "a.ts" }: Fixture): void {
 		JSON.stringify({
 			jsPlugins: [pluginPath],
 			categories: {},
-			rules: { [`codycodes/${rule}`]: "error" },
+			rules: { [`codydotjs/${rule}`]: "error" },
 		}),
 	);
 	writeFileSync(join(rootDirectory, fileName), source);
@@ -42,7 +42,7 @@ function lint({ rule, source, fileName = "a.ts" }: Fixture): string[] {
 		throw result.error;
 	}
 	const ruleIds = Array.from(
-		result.stdout.matchAll(/\[Error\/codycodes\((?<id>[a-z-]+)\)\]/gu),
+		result.stdout.matchAll(/\[Error\/codydotjs\((?<id>[a-z-]+)\)\]/gu),
 		(match) => match.groups?.id ?? "",
 	);
 	// Why check the exit: a config error or a rule that throws also prints no rule diagnostic.
@@ -67,7 +67,7 @@ describe.each([
 			"if (value == null) {}",
 			"if (value != null) {}",
 			'if (typeof Bun === "undefined") {}',
-			"// oxlint-disable-next-line codycodes/prefer-null-check -- `null` means a cleared value here.\nif (value === undefined) {}",
+			"// oxlint-disable-next-line codydotjs/prefer-null-check -- `null` means a cleared value here.\nif (value === undefined) {}",
 		],
 	},
 	{

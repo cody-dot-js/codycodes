@@ -4,8 +4,9 @@ import { DitherOcean } from "~/features/dither-ocean/dither-ocean.tsx";
 import { Nug } from "~/features/nug/nug.tsx";
 
 /** Where the buttons send a reader. The query tells ngrok's analytics that the visit came from this site. */
-const DASHBOARD_URL = "https://dashboard.ngrok.com/?utm_source=codycod.es&utm_medium=referral";
-const SIGNUP_URL = "https://dashboard.ngrok.com/signup?utm_source=codycod.es&utm_medium=referral";
+const DASHBOARD_URL = "https://dashboard.ngrok.com/?utm_source=codydotjs.dev&utm_medium=referral";
+const SIGNUP_URL =
+	"https://dashboard.ngrok.com/signup?utm_source=codydotjs.dev&utm_medium=referral";
 
 /**
  * The call to action at the end of a post: a title, a line on where the work

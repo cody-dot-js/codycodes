@@ -16,4 +16,4 @@ Search for an existing helper, React Router feature, or Web API before you write
 
 **In this repo:** look in `app/features/` first, then in React Router and the Web platform. Check `package.json` before you add a dependency ([CONVENTIONS.md § Package Management](../../CONVENTIONS.md#package-management)).
 
-**Enforced by:** review, and `codycodes/prefer-url-parse` in [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/).
+**Enforced by:** review, and `codydotjs/prefer-url-parse` in [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/).

@@ -1,5 +1,5 @@
 /** The canonical origin. Every absolute URL on the site, feed, and twin starts with it. */
-export const SITE_ORIGIN = "https://codycod.es";
+export const SITE_ORIGIN = "https://codydotjs.dev";
 
 /** The site name, for titles and feeds. */
 export const SITE_NAME = "Cody Price";
@@ -27,7 +27,7 @@ export const SITE_IMAGE = {
  * Makes an absolute URL on the canonical origin.
  *
  * @example
- * absoluteUrl("/posts/hello"); // => "https://codycod.es/posts/hello"
+ * absoluteUrl("/posts/hello"); // => "https://codydotjs.dev/posts/hello"
  */
 export function absoluteUrl(path: string) {
 	return new URL(path, SITE_ORIGIN).href;
