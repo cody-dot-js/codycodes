@@ -192,7 +192,7 @@
         "app/root.tsx",
         "app/routes.ts",
         "app/routes/**",
-        "content/*/*/demo.tsx",
+        "content/*/*/demo*.tsx",
         "app/entry.server.tsx",
         "server.ts",
         "*.config.ts"
@@ -203,9 +203,9 @@
     },
     {
       // Why: a route module exports `loader` and `meta` next to its component, and the root exports
-      // `Layout`, `App`, and `ErrorBoundary`. React Router owns that contract. A post's `demo.tsx` is a
+      // `Layout`, `App`, and `ErrorBoundary`. React Router owns that contract. A post's `demo*.tsx` is a
       // route module too.
-      "files": ["app/root.tsx", "app/routes/**", "content/*/*/demo.tsx"],
+      "files": ["app/root.tsx", "app/routes/**", "content/*/*/demo*.tsx"],
       "rules": {
         "react/only-export-components": "off",
         "react/no-multi-comp": "off"

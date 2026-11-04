@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "target": "ES2025",
     "lib": ["ES2025", "DOM", "DOM.Iterable"],
-    "types": ["node", "vite/client"],
+    "types": ["node", "vite/client", "mdx"],
     "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "Bundler",

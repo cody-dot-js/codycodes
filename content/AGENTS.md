@@ -30,7 +30,8 @@ syndication:
 - Write markdown. The page renders the title, the date, the tags, and the description from the frontmatter. Do not repeat them in the body.
 - Use `##` for sections. The title is the only `h1`.
 - Import a kit part from `app/components/mdx/`, such as `BeforeAfter`. Put a component that only one post uses next to that post.
-- Each post gets a markdown twin at `/posts/<slug>.md` for agents. It is the MDX source with the imports removed, so a demo shows as its JSX.
+- A live demo is a route module next to the post: `demo.tsx`, or `demo-<name>.tsx` for a second one. It is a page at `/posts/<slug>/<file name>`, with no site chrome. Embed it with `LiveDemo` from `app/components/mdx/`.
+- Each post gets a markdown twin at `/posts/<slug>.md` for agents. It is plain markdown: the imports go, and each kit component becomes the markdown for what it shows, such as a link to a demo. A new kit component needs an entry in `COMPONENTS` in `app/features/posts/markdown.ts`. Without one, the twin shows only a comment.
 
 ## Before you publish
 

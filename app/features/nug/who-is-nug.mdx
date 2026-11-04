@@ -1,0 +1,19 @@
+import { NugSays } from "~/components/mdx/nug-says.tsx";
+import { Nug } from "~/features/nug/nug.tsx";
+
+<div className="grid items-center gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
+  <Nug size={176} className="justify-self-center rounded-xl" />
+  <div className="grid gap-4">
+
+This is Nug, the "official" unofficial ngrok mascot. Nobody made it official, and nobody has stopped him yet. He's a shrimp in an ngrok hoodie and a captain's hat, and he's here to help you shrimp.[^shrimp]
+
+When a post has a side note you can skip, Nug says it: extra context, some prior art, or a link worth the detour. He's drawn in the same 4×4 dither as the rest of the site.
+
+  </div>
+</div>
+
+A side note from Nug looks like this:
+
+<NugSays>Click me. I float a heart for every pet, and I close my eyes when I'm happy.</NugSays>
+
+[^shrimp]: _To shrimp_ is a play on _to ship_, which is why Nug wears a captain's hat. At ngrok, we like to say we're shrimping all the time.

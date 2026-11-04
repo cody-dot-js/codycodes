@@ -51,6 +51,13 @@
 		cursor: pointer;
 	}
 
+	/* Why only with motion: a jump to a heading or a note glides, but a reader who asks for less motion gets a cut. */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
 	::selection {
 		background: var(--color-blush);
 		color: var(--color-abyss-3);
@@ -89,7 +96,8 @@
 		letter-spacing: -0.01em;
 	}
 
-	& a {
+	/* Why no class: a markdown link has none. A component's link, such as a button, and a footnote link keep their own style. */
+	& a:not([class], [data-footnote-ref], [data-footnote-backref]) {
 		color: var(--color-blush);
 		text-decoration: underline;
 		text-underline-offset: 3px;
@@ -121,6 +129,17 @@
 		border-left: 2px solid var(--color-blush);
 		padding-left: 1rem;
 		color: var(--color-label);
+	}
+
+	/* Why: a link to an API's docs keeps the code color, and its underline shows that it is a link. */
+	& a:not([class], [data-footnote-ref], [data-footnote-backref]):has(> code) {
+		color: var(--color-label);
+		text-decoration-color: rgb(169 200 209 / 0.5);
+
+		&:hover {
+			color: var(--color-ink);
+			text-decoration-color: currentColor;
+		}
 	}
 
 	& :not(pre) > code {
@@ -210,5 +229,432 @@ html[data-over-shrimp="true"] * {
 @media (prefers-reduced-motion: no-preference) {
 	.speech-tail {
 		animation: speech-tail-flow 0.9s linear infinite;
+	}
+}
+
+/* Nug bobs in two steps, like a sprite. Still with reduced motion. */
+@keyframes nug-bob {
+	50% {
+		translate: 0 -2px;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.nug img {
+		animation: nug-bob 1.6s steps(1) infinite;
+	}
+}
+
+/*
+ * The nug walk, his plug walk, after three quick pets. Each beat is one sprite
+ * step of 300 ms. He squashes down and stretches up on each beat, shuffles out
+ * and back with a lean, swings his thumb arm, kicks one foot and then the
+ * other. The arm and each foot are clipped copies
+ * of the happy frame, and the body has a hole where each one sits. The boxes
+ * are shares of the sprite. He never turns around, because a mirror would put
+ * "ngrok" backward on his hoodie. The time matches `NUG_WALK_MS` in `beat.ts`.
+ * No walk with reduced motion.
+ */
+@keyframes nug-walk {
+	0% {
+		translate: 0 0;
+		rotate: -4deg;
+		scale: 1.06 0.92;
+	}
+	12.5% {
+		translate: -4% -6%;
+		rotate: -10deg;
+		scale: 0.96 1.06;
+	}
+	25% {
+		translate: -8% 0;
+		rotate: -4deg;
+		scale: 1.06 0.92;
+	}
+	37.5% {
+		translate: -10% -6%;
+		rotate: -10deg;
+		scale: 0.96 1.06;
+	}
+	50% {
+		translate: -6% 0;
+		rotate: 4deg;
+		scale: 1.06 0.92;
+	}
+	62.5% {
+		translate: -2% -6%;
+		rotate: 10deg;
+		scale: 0.96 1.06;
+	}
+	75% {
+		translate: 2% 0;
+		rotate: 4deg;
+		scale: 1.06 0.92;
+	}
+	87.5% {
+		translate: 0 -6%;
+		rotate: 10deg;
+		scale: 0.96 1.06;
+	}
+	100% {
+		translate: 0 0;
+		rotate: 0deg;
+		scale: 1 1;
+	}
+}
+
+@keyframes nug-walk-arm {
+	0% {
+		rotate: 20deg;
+	}
+	12.5% {
+		rotate: -35deg;
+	}
+	25% {
+		rotate: 20deg;
+	}
+	37.5% {
+		rotate: -35deg;
+	}
+	50% {
+		rotate: 20deg;
+	}
+	62.5% {
+		rotate: -35deg;
+	}
+	75% {
+		rotate: 20deg;
+	}
+	87.5% {
+		rotate: -35deg;
+	}
+	100% {
+		rotate: 0deg;
+	}
+}
+
+/* Why two kick animations: the feet take turns, one on the even beats and one on the odd. */
+@keyframes nug-walk-left-foot {
+	0% {
+		translate: -4% -12%;
+		rotate: -25deg;
+	}
+	12.5% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	25% {
+		translate: -4% -12%;
+		rotate: -25deg;
+	}
+	37.5% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	50% {
+		translate: -4% -12%;
+		rotate: -25deg;
+	}
+	62.5% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	75% {
+		translate: -4% -12%;
+		rotate: -25deg;
+	}
+	87.5% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	100% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+}
+
+@keyframes nug-walk-right-foot {
+	0% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	12.5% {
+		translate: 2% -12%;
+		rotate: 12deg;
+	}
+	25% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	37.5% {
+		translate: 2% -12%;
+		rotate: 12deg;
+	}
+	50% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	62.5% {
+		translate: 2% -12%;
+		rotate: 12deg;
+	}
+	75% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+	87.5% {
+		translate: 2% -12%;
+		rotate: 12deg;
+	}
+	100% {
+		translate: 0 0;
+		rotate: 0deg;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.nug[data-nug-walk] {
+		/* Why the bottom: he squashes onto his feet and leans from them. */
+		transform-origin: 50% 100%;
+		animation: nug-walk 2.4s steps(1);
+	}
+
+	/*
+	 * Why only the body: a rule for every image here would outrank the limb rules
+	 * and stop each limb. Why evenodd: each limb box is a hole in the body, so the
+	 * body never shows a second arm or foot.
+	 */
+	.nug[data-nug-walk] img:not([data-limb]) {
+		animation: none;
+		clip-path: polygon(
+			evenodd,
+			0 0,
+			100% 0,
+			100% 100%,
+			0 100%,
+			0 0,
+			11% 47%,
+			21% 47%,
+			21% 53%,
+			26% 53%,
+			26% 67%,
+			11% 67%,
+			11% 47%,
+			0 0,
+			25% 86%,
+			43% 86%,
+			43% 100%,
+			25% 100%,
+			25% 86%,
+			0 0,
+			50% 89%,
+			60% 89%,
+			60% 93%,
+			68% 93%,
+			68% 100%,
+			50% 100%,
+			50% 89%,
+			0 0
+		);
+	}
+
+	.nug [data-limb="arm"] {
+		/* Why the step: the cut goes around his cheek, so a swing never carries a piece of his face. */
+		clip-path: polygon(11% 47%, 21% 47%, 21% 53%, 26% 53%, 26% 67%, 11% 67%);
+		transform-origin: 25% 66%;
+		animation: nug-walk-arm 2.4s steps(1);
+	}
+
+	.nug [data-limb="left-foot"] {
+		clip-path: inset(86% 57% 0 25%);
+		transform-origin: 38% 88%;
+		animation: nug-walk-left-foot 2.4s steps(1);
+	}
+
+	.nug [data-limb="right-foot"] {
+		/* Why the step: the cut goes under his tail, so a kick never carries a piece of it. */
+		clip-path: polygon(50% 89%, 60% 89%, 60% 93%, 68% 93%, 68% 100%, 50% 100%);
+		transform-origin: 55% 90%;
+		animation: nug-walk-right-foot 2.4s steps(1);
+	}
+}
+
+/* The CTA card's grid: the ocean's 24 px rhythm in faint label blue. */
+.cta-grid {
+	background-image:
+		linear-gradient(rgb(169 200 209 / 0.07) 1px, transparent 1px),
+		linear-gradient(90deg, rgb(169 200 209 / 0.07) 1px, transparent 1px);
+	background-size: 24px 24px;
+}
+
+/*
+ * Footnotes. A mark is a small pink number (or `?`) in a ring. The notes sit under a rule at the
+ * end of a post, and each ends with a pink back link. Markdown footnotes (`[^1]`) render this
+ * markup in a post and in any page that renders MDX, such as `/nug`.
+ */
+sup:has(> a[data-footnote-ref]) {
+	line-height: 0;
+}
+
+a[data-footnote-ref] {
+	/* Why: a jump back lands the mark mid-screen, with room above it for the bubbles. */
+	scroll-margin-block: 30vh;
+	position: relative;
+	display: inline-grid;
+	place-items: center;
+	min-width: 1.35em;
+	height: 1.35em;
+	margin-left: 0.15em;
+	padding-inline: 0.25em;
+	border: 1px solid rgb(255 177 170 / 0.6);
+	border-radius: 999px;
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	line-height: 1;
+	color: var(--color-blush);
+	text-decoration: none;
+
+	/* Why: the ring is small, so the tap area reaches past it, for a thumb. */
+	&::before {
+		content: "";
+		position: absolute;
+		inset: -0.6rem;
+	}
+
+	&:hover,
+	&:target {
+		background: var(--color-blush);
+		color: var(--color-abyss-3);
+	}
+}
+
+a[data-footnote-backref] {
+	color: var(--color-blush);
+	text-decoration: none;
+	font-family: var(--font-mono);
+
+	&:hover {
+		color: var(--color-ink);
+	}
+}
+
+.post-body [data-footnotes] {
+	margin-top: 2rem;
+	border-top: 1px solid var(--color-rule);
+	padding-top: 1rem;
+	font-size: 0.92rem;
+	color: var(--color-label);
+
+	& ol {
+		list-style: decimal;
+	}
+
+	& li {
+		scroll-margin-block: 30vh;
+		border-radius: 10px;
+		padding: 0.25rem 0.5rem;
+	}
+
+	& li:target {
+		outline: 1px solid var(--color-blush);
+		color: var(--color-ink);
+	}
+}
+
+/* The bubble that pops around a mark when a reader comes back to it, and the small ones that drift up. */
+.footnote-pop {
+	position: absolute;
+	inset: -0.35rem;
+	border: 1.5px dotted rgb(255 177 170 / 0.9);
+	border-radius: 999px;
+	pointer-events: none;
+	animation: footnote-pop 0.5s ease-out forwards;
+}
+
+.footnote-bubble {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	width: var(--size);
+	height: var(--size);
+	border: 1.5px dotted rgb(169 200 209 / 0.85);
+	border-radius: 999px;
+	pointer-events: none;
+	opacity: 0;
+	animation: footnote-bubble 1.3s var(--delay) ease-out forwards;
+
+	/* The cream glint at the top left, as on the 3D shrimp's bubbles. */
+	&::after {
+		content: "";
+		position: absolute;
+		top: 12%;
+		left: 12%;
+		width: 1.5px;
+		height: 1.5px;
+		background: rgb(255 248 241 / 0.9);
+	}
+}
+
+@keyframes footnote-pop {
+	from {
+		opacity: 1;
+		scale: 0.6;
+	}
+
+	to {
+		opacity: 0;
+		scale: 1.6;
+	}
+}
+
+@keyframes footnote-bubble {
+	0% {
+		opacity: 0;
+		translate: -50% 0;
+	}
+
+	15% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+		translate: calc(-50% + var(--drift)) -2.6rem;
+	}
+}
+
+/* A footnote that a reader jumped to: a pink ring pulses around it, and its `em` words get a pink underline. */
+.post-body [data-footnotes] li:target {
+	border-color: var(--color-blush);
+
+	& em {
+		color: var(--color-blush);
+		background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 2px;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.post-body [data-footnotes] li:target {
+		animation: note-ring 1.2s ease-out 2;
+
+		& em {
+			animation: note-underline 0.6s 0.4s ease-out both;
+		}
+	}
+}
+
+@keyframes note-ring {
+	from {
+		box-shadow: 0 0 0 0 rgb(255 177 170 / 0.6);
+	}
+
+	to {
+		box-shadow: 0 0 0 16px rgb(255 177 170 / 0);
+	}
+}
+
+@keyframes note-underline {
+	from {
+		background-size: 0 2px;
 	}
 }
