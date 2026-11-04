@@ -230,7 +230,16 @@ export function mountShrimpTank({
 	}
 	renderer.setClearColor(0x000000, 0);
 	renderer.domElement.setAttribute("aria-hidden", "true");
-	renderer.domElement.className = "absolute inset-0 z-[1] block size-full";
+	// Why inline styles: the scene sizes its own canvas, so it needs no stylesheet. Unstyled, the
+	// canvas renders at its pixel size, which is twice the CSS size on a 2× screen.
+	Object.assign(renderer.domElement.style, {
+		position: "absolute",
+		inset: "0",
+		zIndex: "1",
+		display: "block",
+		width: "100%",
+		height: "100%",
+	});
 	tank.prepend(renderer.domElement);
 
 	const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
