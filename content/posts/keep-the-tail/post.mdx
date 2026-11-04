@@ -7,8 +7,10 @@ tags:
 image:
   src: /posts/keep-the-tail/card.jpg
   alt: Two boxes with the same three endpoint IDs. On the left, CSS truncate shows ep_2abcdEFGhijKL… three times. On the right, TruncatedText shows ep_2abcdEF…123456, …789012, and …345678.
+video: /posts/keep-the-tail/card.mp4
 ---
 
+import { Btw } from "~/components/mdx/btw.tsx";
 import { LiveDemo } from "~/components/mdx/live-demo.tsx";
 
 Put three endpoint IDs in a narrow column with `text-overflow: ellipsis`, and all three read `ep_2abcdEFGhijKL…`. The ellipsis eats the end of each ID, and the end is the only part that tells them apart.
@@ -26,6 +28,11 @@ In the right-hand column, try these:
 - Drag the frame wider until every ID fits, then narrow it again. The head gives way, and the last six characters stay put.
 - Copy a clipped ID and paste it somewhere. You get the whole ID on one line, with no ellipsis in it.
 - Hover a clipped ID, or Tab to it, to read the whole value in a tooltip.
+
+<Btw>
+  The frame runs `@ngrok/mantle` 0.93.7 from npm, not a copy of it. mantle is [open
+  source](https://github.com/ngrok/mantle) under the MIT license.
+</Btw>
 
 ## Use it
 
@@ -70,6 +77,12 @@ So the two visible halves are `aria-hidden`, and a visually hidden span holds th
 ```
 
 The hidden copy has `user-select: none`, so one click still copies the value once, not twice. `translate="no"` keeps a browser's translate feature away from a value you're meant to copy.
+
+<Btw>
+  Browser translation rewrites the page's text nodes behind React's back. React has had an [open
+  issue about it since 2017](https://github.com/facebook/react/issues/11538). An ID never needs
+  translating, so the component opts out.
+</Btw>
 
 ## What it costs
 

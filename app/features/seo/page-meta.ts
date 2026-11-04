@@ -12,6 +12,8 @@ type PageMetaOptions = {
 	type?: "article" | "website";
 	/** The link-preview image: a path on this site and its alt text. Without it, the preview has no image. */
 	image?: { src: string; alt: string } | undefined;
+	/** A 1280x720 MP4 loop of the image, for the platforms that play `og:video`. X shows the image. */
+	video?: string | undefined;
 	/** Extra head tags for this page, such as the markdown twin link. */
 	extra?: MetaDescriptor[];
 };
@@ -30,6 +32,7 @@ export function pageMeta({
 	path,
 	type = "website",
 	image,
+	video,
 	extra = [],
 }: PageMetaOptions) {
 	const fullTitle = title == null ? SITE_NAME : `${title} · ${SITE_NAME}`;
@@ -50,6 +53,14 @@ export function pageMeta({
 					{ property: "og:image:alt", content: image.alt },
 					{ name: "twitter:card", content: "summary_large_image" },
 					{ name: "twitter:image:alt", content: image.alt },
+				]),
+		...(video == null
+			? []
+			: [
+					{ property: "og:video", content: absoluteUrl(video) },
+					{ property: "og:video:type", content: "video/mp4" },
+					{ property: "og:video:width", content: "1280" },
+					{ property: "og:video:height", content: "720" },
 				]),
 		{ name: "twitter:creator", content: `@${X_HANDLE}` },
 		...extra,

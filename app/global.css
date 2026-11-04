@@ -58,8 +58,15 @@
  */
 .post-body {
 	display: grid;
+	/* Why minmax(0, 1fr): a wide child, such as a resized demo, must not widen the column or the page. */
+	grid-template-columns: minmax(0, 1fr);
 	gap: 1.1rem;
-	max-width: 68ch;
+	/* Why 65ch: Tailwind's max-w-prose. Lines stay short enough to read in one sweep. */
+	max-width: 65ch;
+
+	& :where(h2, h3) {
+		scroll-margin-top: 2rem;
+	}
 
 	& h2 {
 		margin-top: 1.6rem;
@@ -117,13 +124,18 @@
 		color: var(--color-label);
 	}
 
-	& pre {
-		overflow-x: auto;
+	& .code-block {
+		overflow: hidden;
+		border: 1px solid var(--color-rule);
 		border-radius: 10px;
 		background: var(--color-panel);
+	}
+
+	& pre {
+		overflow-x: auto;
 		padding: 1rem 1.25rem;
 		font-family: var(--font-mono);
-		font-size: 0.88rem;
+		font-size: 0.85rem;
 		line-height: 1.7;
 	}
 

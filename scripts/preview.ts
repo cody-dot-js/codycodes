@@ -20,6 +20,7 @@ const CONTENT_TYPES: Record<string, string> = {
 	".jpg": "image/jpeg",
 	".json": "application/json",
 	".md": "text/markdown; charset=utf-8",
+	".mp4": "video/mp4",
 	".png": "image/png",
 	".txt": "text/plain; charset=utf-8",
 	".woff2": "font/woff2",

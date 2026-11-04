@@ -1,11 +1,23 @@
 import mdx from "@mdx-js/rollup";
+import rehypeShiki from "@shikijs/rehype";
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+import type { ShikiTransformer } from "shiki";
 import { defineConfig } from "vite";
+
+import { abyssTheme } from "./app/features/code/abyss-theme.ts";
+import { rehypePostHandle } from "./app/features/posts/rehype-post-handle.ts";
+
+/** Puts the fence's language on the `pre`, so the code block can show it in its header. */
+const languageOnPre: ShikiTransformer = {
+	pre(node) {
+		node.properties["data-language"] = this.options.lang;
+	},
+};
 
 export default defineConfig({
 	build: {
@@ -21,7 +33,19 @@ export default defineConfig({
 			include: /\.mdx$/u,
 			// Why `frontmatter` export: `posts.server.ts` reads it with `import.meta.glob`.
 			remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter, remarkGfm],
-			rehypePlugins: [rehypeSlug],
+			rehypePlugins: [
+				rehypeSlug,
+				rehypePostHandle,
+				[
+					rehypeShiki,
+					{
+						theme: abyssTheme,
+						transformers: [languageOnPre],
+					},
+				],
+			],
+			// Why a provider: the post layout maps `pre` to the code block, with its copy button.
+			providerImportSource: "@mdx-js/react",
 		}),
 		reactRouter(),
 	],
