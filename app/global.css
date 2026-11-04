@@ -233,7 +233,15 @@ html[data-over-shrimp="true"] * {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	.nug canvas {
+	.nug img {
 		animation: nug-bob 1.6s steps(1) infinite;
 	}
+}
+
+/* The CTA card's grid: the ocean's 24 px rhythm in faint label blue. */
+.cta-grid {
+	background-image:
+		linear-gradient(rgb(169 200 209 / 0.07) 1px, transparent 1px),
+		linear-gradient(90deg, rgb(169 200 209 / 0.07) 1px, transparent 1px);
+	background-size: 24px 24px;
 }

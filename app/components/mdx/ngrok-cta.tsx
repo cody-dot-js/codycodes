@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { DitherOcean } from "~/features/dither-ocean/dither-ocean.tsx";
 import { Nug } from "~/features/nug/nug.tsx";
 
 /** Where the buttons send a reader. The query tells ngrok's analytics that the visit came from this site. */
@@ -7,8 +8,9 @@ const DASHBOARD_URL = "https://dashboard.ngrok.com/?utm_source=codycod.es&utm_me
 const SIGNUP_URL = "https://dashboard.ngrok.com/signup?utm_source=codycod.es&utm_medium=referral";
 
 /**
- * The call to action at the end of a post: Nug, a title, a line on where the
- * work lives in ngrok, and two buttons, to the dashboard and to sign up.
+ * The call to action at the end of a post: a title, a line on where the work
+ * lives in ngrok, and buttons to the dashboard and to sign up. Nug stands in
+ * the dither waves at the side, over a faint grid.
  *
  * @example
  * <NgrokCta title="See it in the ngrok dashboard">Every endpoint ID keeps its tail.</NgrokCta>
@@ -17,28 +19,36 @@ export function NgrokCta({ title, children }: { title: string; children: ReactNo
 	return (
 		<aside
 			aria-label={title}
-			className="mt-6 grid justify-items-center gap-4 rounded-2xl border border-teal/30 bg-panel p-5 text-center sm:grid-cols-[8rem_minmax(0,1fr)] sm:justify-items-start sm:text-left"
+			className="relative mt-8 grid overflow-hidden rounded-2xl border border-teal/25 bg-abyss-2 sm:grid-cols-[minmax(0,1fr)_11rem]"
 		>
-			<Nug className="size-32" />
-			<div className="grid content-center gap-3">
+			{/* Why a masked grid: the texture fades toward the text, so it never fights the words. */}
+			<div
+				aria-hidden="true"
+				className="cta-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_left,black,transparent_75%)]"
+			/>
+			<div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-72">
+				<DitherOcean />
+			</div>
+			<div className="relative grid content-center gap-3 p-6 sm:py-8 sm:pr-0">
 				<p className="font-mono text-xs tracking-wider text-teal uppercase">built at ngrok</p>
-				<p className="text-xl font-semibold tracking-tight text-ink">{title}</p>
+				<p className="text-2xl font-semibold tracking-tight text-balance text-ink">{title}</p>
 				<div className="text-label">{children}</div>
-				<p className="flex flex-wrap justify-center gap-3 font-mono text-sm sm:justify-start">
+				<p className="mt-1 flex flex-wrap gap-3 font-mono text-sm">
 					<a
 						href={DASHBOARD_URL}
-						className="cta-primary rounded-full bg-blush px-4 py-2 font-medium text-abyss-3 no-underline hover:bg-ink"
+						className="rounded-full bg-blush px-4 py-2 font-medium text-abyss-3 hover:bg-ink"
 					>
 						open the dashboard
 					</a>
 					<a
 						href={SIGNUP_URL}
-						className="cta-secondary rounded-full border border-label/40 px-4 py-2 text-ink no-underline hover:border-ink"
+						className="rounded-full border border-label/40 bg-abyss-2/70 px-4 py-2 text-ink hover:border-ink"
 					>
 						sign up for free
 					</a>
 				</p>
 			</div>
+			<Nug className="relative order-first size-44 justify-self-center sm:order-none sm:self-end" />
 		</aside>
 	);
 }
