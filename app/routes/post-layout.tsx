@@ -10,8 +10,8 @@ export function loader({ url }: LoaderFunctionArgs) {
 	if (post == null) {
 		throw data(null, { status: 404, statusText: "Not Found" });
 	}
-	const { date, description, href, markdownHref, syndication, tags, title, updated } = post;
-	return { date, description, href, markdownHref, syndication, tags, title, updated };
+	const { date, description, href, image, markdownHref, syndication, tags, title, updated } = post;
+	return { date, description, href, image, markdownHref, syndication, tags, title, updated };
 }
 
 export const meta: MetaFunction<typeof loader> = ({ loaderData }) =>
@@ -22,6 +22,7 @@ export const meta: MetaFunction<typeof loader> = ({ loaderData }) =>
 				description: loaderData.description,
 				path: loaderData.href,
 				type: "article",
+				image: loaderData.image,
 				extra: [
 					{ property: "article:published_time", content: loaderData.date },
 					{

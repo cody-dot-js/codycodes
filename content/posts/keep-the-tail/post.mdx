@@ -1,0 +1,80 @@
+---
+title: Keep the tail, clip the middle
+description: CSS truncate hides the end of an ID, and the end is the part that differs. mantle's TruncatedText clips the middle instead. Here's why it isn't flex, what a screen reader hears, and what it costs.
+date: 2026-11-04
+tags:
+  - frontend
+image:
+  src: /posts/keep-the-tail/card.jpg
+  alt: Two boxes with the same three endpoint IDs. On the left, CSS truncate shows ep_2abcdEFGhijKL… three times. On the right, TruncatedText shows ep_2abcdEF…123456, …789012, and …345678.
+---
+
+import { LiveDemo } from "~/components/mdx/live-demo.tsx";
+
+Put three endpoint IDs in a narrow column with `text-overflow: ellipsis`, and all three read `ep_2abcdEFGhijKL…`. The ellipsis eats the end of each ID, and the end is the only part that tells them apart.
+
+[mantle](https://mantle.ngrok.com), ngrok's React component library, has a component for this now. `TruncatedText` clips the middle and keeps the tail. Here are the same three IDs both ways, rendered by the real component:
+
+<LiveDemo
+  src="/posts/keep-the-tail/demo"
+  title="Three endpoint IDs under CSS truncate and under TruncatedText"
+  height={162}
+/>
+
+In the right-hand column, try these:
+
+- Drag the frame wider until every ID fits, then narrow it again. The head gives way, and the last six characters stay put.
+- Copy a clipped ID and paste it somewhere. You get the whole ID on one line, with no ellipsis in it.
+- Hover a clipped ID, or Tab to it, to read the whole value in a tooltip.
+
+## Use it
+
+```tsx
+import { TruncatedText } from "@ngrok/mantle/truncated-text";
+
+// Keep the six characters that tell two IDs apart.
+<TruncatedText tail={6} value="ep_2abcdEFGhijKL123456" />
+
+// Keep the type prefix too: mem_…A8KImPbQ
+<TruncatedText head={4} value="mem_21h80N9qQuAmhSB8nlTA8KImPbQ" />
+```
+
+`tail` defaults to 8, enough for the last path segment of most URLs. It counts graphemes, not characters, so an emoji or a letter with a combining accent never splits in half.
+
+## How it clips
+
+`TruncatedText` splits the value with `Intl.Segmenter` and renders the two parts as inline-block spans. The head clips with a plain CSS ellipsis and takes whatever width the tail leaves. A `ResizeObserver` measures both on mount and on every resize. Only a value that overflows gets a `data-truncated` attribute, a tab stop, and a tooltip. A value that fits renders as plain text.
+
+In a monospace font, the head's width rounds down to whole `ch` cells, so the last clipped glyph, the ellipsis, and the tail sit flush. Ligatures are off too. A `//` that shapes into one glyph would otherwise lose both slashes to a single clip.
+
+## Why not flex
+
+[The issue](https://github.com/ngrok/mantle/issues/1549) proposed flex: a row with a head that shrinks and a tail that doesn't. It lays out fine, and it copies wrong. Chromium and WebKit put a newline between two flex items when they serialize a selection, so a copied ID pasted as two lines.
+
+Two inline-block spans copy as one line in Chromium, Firefox, and WebKit. I measured all three through Playwright before I picked the layout. `user-select: all` on the root selects the whole value in one click, and CSS draws the ellipsis, so it never lands in what you copy.
+
+## What a screen reader hears
+
+Inline-block fixed the copy and broke the accessible name. Chromium puts a space between two inline-block boxes when it builds a name, so a screen reader announced the ID as two strings.
+
+So the two visible halves are `aria-hidden`, and a visually hidden span holds the whole value as one text node. A clipped ID renders like this, with the classes left out:
+
+```html
+<span data-slot="truncated-text" data-truncated tabindex="0" translate="no" dir="ltr">
+  <span data-slot="truncated-text-value">ep_2abcdEFGhijKL123456</span>
+  <span aria-hidden="true" data-slot="truncated-text-head">ep_2abcdEFGhijKL</span>
+  <span aria-hidden="true" data-slot="truncated-text-tail" dir="rtl">
+    <span dir="ltr">123456</span>
+  </span>
+</span>
+```
+
+The hidden copy has `user-select: none`, so one click still copies the value once, not twice. `translate="no"` keeps a browser's translate feature away from a value you're meant to copy.
+
+## What it costs
+
+Every instance runs its own `ResizeObserver`. A paged list of 20 IDs runs 20 observers. A table that renders every row runs one per row, so page a long table or virtualize it.
+
+An auto-layout table also grows its column to fit the whole value, which defeats the clip. Set `table-layout: fixed` on the table and give it a width.
+
+`TruncatedText` shipped in mantle 0.89.0 on October 14. The [docs](https://mantle.ngrok.com/components/data-display/truncated-text) cover `head`, `asChild`, and styling each half, and [mantle#1550](https://github.com/ngrok/mantle/pull/1550) has the browser measurements behind the layout.

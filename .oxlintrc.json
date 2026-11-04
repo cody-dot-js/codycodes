@@ -187,15 +187,22 @@
     },
     {
       // Why: React Router loads a route module, and the tools load a config, by its default export.
-      "files": ["app/root.tsx", "app/routes.ts", "app/routes/**", "*.config.ts"],
+      "files": [
+        "app/root.tsx",
+        "app/routes.ts",
+        "app/routes/**",
+        "content/*/*/demo.tsx",
+        "*.config.ts"
+      ],
       "rules": {
         "import/no-default-export": "off"
       }
     },
     {
       // Why: a route module exports `loader` and `meta` next to its component, and the root exports
-      // `Layout`, `App`, and `ErrorBoundary`. React Router owns that contract.
-      "files": ["app/root.tsx", "app/routes/**"],
+      // `Layout`, `App`, and `ErrorBoundary`. React Router owns that contract. A post's `demo.tsx` is a
+      // route module too.
+      "files": ["app/root.tsx", "app/routes/**", "content/*/*/demo.tsx"],
       "rules": {
         "react/only-export-components": "off",
         "react/no-multi-comp": "off"

@@ -35,6 +35,17 @@ describe("parsePosts", () => {
 		).toThrow(/draft/u);
 	});
 
+	it("rejects a preview image that is not a post image in public/", () => {
+		expect(() =>
+			parsePosts({
+				"/content/posts/remote/post.mdx": {
+					...valid,
+					image: { src: "https://example.com/card.jpg", alt: "A card." },
+				},
+			}),
+		).toThrow(/image[\s\S]*public/u);
+	});
+
 	it("rejects a folder name that is not a slug", () => {
 		expect(() => parsePosts({ "/content/posts/Not_A_Slug/post.mdx": valid })).toThrow(
 			/lowercase words/u,

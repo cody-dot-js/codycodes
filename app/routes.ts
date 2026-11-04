@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+
 import type { RouteConfig } from "@react-router/dev/routes";
 import { index, layout, route } from "@react-router/dev/routes";
 
@@ -28,6 +30,13 @@ export default [
 			: []),
 		route("*", "routes/not-found.tsx"),
 	]),
+	// Why outside the site layout: a post embeds its demo in a frame, so the demo has no site chrome.
+	...postFiles.flatMap((post) => {
+		const demo = post.file.replace(/post\.mdx$/u, "demo.tsx");
+		return existsSync(demo)
+			? [route(`posts/${post.slug}/demo`, `../${demo}`, { id: `post-demo/${post.slug}` })]
+			: [];
+	}),
 	...postFiles.map((post) =>
 		route(`posts/${post.slug}.md`, "routes/post-markdown.ts", { id: `post-markdown/${post.slug}` }),
 	),

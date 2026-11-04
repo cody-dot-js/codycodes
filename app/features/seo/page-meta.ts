@@ -10,6 +10,8 @@ type PageMetaOptions = {
 	path: string;
 	/** `article` for a post. Default `website`. */
 	type?: "article" | "website";
+	/** The link-preview image: a path on this site and its alt text. Without it, the preview has no image. */
+	image?: { src: string; alt: string } | undefined;
 	/** Extra head tags for this page, such as the markdown twin link. */
 	extra?: MetaDescriptor[];
 };
@@ -27,6 +29,7 @@ export function pageMeta({
 	description,
 	path,
 	type = "website",
+	image,
 	extra = [],
 }: PageMetaOptions) {
 	const fullTitle = title == null ? SITE_NAME : `${title} · ${SITE_NAME}`;
@@ -40,7 +43,14 @@ export function pageMeta({
 		{ property: "og:title", content: title ?? SITE_NAME },
 		{ property: "og:description", content: description },
 		{ property: "og:url", content: url },
-		{ name: "twitter:card", content: "summary" },
+		...(image == null
+			? [{ name: "twitter:card", content: "summary" }]
+			: [
+					{ property: "og:image", content: absoluteUrl(image.src) },
+					{ property: "og:image:alt", content: image.alt },
+					{ name: "twitter:card", content: "summary_large_image" },
+					{ name: "twitter:image:alt", content: image.alt },
+				]),
 		{ name: "twitter:creator", content: `@${X_HANDLE}` },
 		...extra,
 	] satisfies MetaDescriptor[];
