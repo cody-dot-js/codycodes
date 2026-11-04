@@ -5,15 +5,15 @@ import { describe, expect, it } from "vitest";
 import { Nug } from "./nug.tsx";
 
 describe("nug", () => {
-	it("starts his plug walk on the third quick pet", () => {
+	it("starts his nug walk on the third quick pet", () => {
 		render(<Nug size={88} className="" />);
 		const nug = screen.getByRole("button", { name: "Pet Nug" });
 
 		fireEvent.click(nug);
 		fireEvent.click(nug);
-		expect(nug.dataset.plugWalk).toBeUndefined();
+		expect(nug.dataset.nugWalk).toBeUndefined();
 
 		fireEvent.click(nug);
-		expect(nug.dataset.plugWalk).toBe("true");
+		expect(nug.dataset.nugWalk).toBe("true");
 	});
 });
