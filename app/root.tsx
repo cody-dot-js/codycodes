@@ -9,6 +9,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { SwimmingFavicon } from "./features/favicon/swimming-favicon.tsx";
 import { SITE_NAME } from "./site.ts";
 
 import geistUrl from "@fontsource-variable/geist/wght.css?url";
@@ -19,7 +20,8 @@ export const links: Route.LinksFunction = () => [
 	{ rel: "stylesheet", href: geistUrl },
 	{ rel: "stylesheet", href: jetbrainsMonoUrl },
 	{ rel: "stylesheet", href: globalUrl },
-	{ rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+	{ rel: "icon", href: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+	{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
 	{ rel: "alternate", type: "application/rss+xml", title: SITE_NAME, href: "/rss.xml" },
 ];
 
@@ -43,7 +45,12 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-	return <Outlet />;
+	return (
+		<>
+			<SwimmingFavicon />
+			<Outlet />
+		</>
+	);
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

@@ -23,6 +23,7 @@ const CONTENT_TYPES: Record<string, string> = {
 	".mp4": "video/mp4",
 	".png": "image/png",
 	".txt": "text/plain; charset=utf-8",
+	".webp": "image/webp",
 	".woff2": "font/woff2",
 	".xml": "application/xml; charset=utf-8",
 };
