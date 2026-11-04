@@ -10,7 +10,7 @@ import {
 
 import type { Route } from "./+types/root";
 import { SwimmingFavicon } from "./features/favicon/swimming-favicon.tsx";
-import { SITE_NAME } from "./site.ts";
+import { SITE_NAME, X_HANDLE } from "./site.ts";
 
 import geistUrl from "@fontsource-variable/geist/wght.css?url";
 import jetbrainsMonoUrl from "@fontsource-variable/jetbrains-mono/wght.css?url";
@@ -23,6 +23,8 @@ export const links: Route.LinksFunction = () => [
 	{ rel: "icon", href: "/favicon.ico", sizes: "16x16 32x32 48x48" },
 	{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
 	{ rel: "alternate", type: "application/rss+xml", title: SITE_NAME, href: "/rss.xml" },
+	{ rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
+	{ rel: "manifest", href: "/site.webmanifest" },
 ];
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -32,6 +34,12 @@ export function Layout({ children }: { children: ReactNode }) {
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 				<meta name="theme-color" content="#02121a" />
+				{/* Why here: these tags are the same on every page. `pageMeta` writes the ones that differ. */}
+				<meta name="author" content={SITE_NAME} />
+				<meta property="og:site_name" content={SITE_NAME} />
+				<meta property="og:locale" content="en_US" />
+				<meta name="twitter:site" content={`@${X_HANDLE}`} />
+				<meta name="twitter:creator" content={`@${X_HANDLE}`} />
 				<Meta />
 				<Links />
 			</head>

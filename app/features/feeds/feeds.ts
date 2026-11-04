@@ -2,8 +2,18 @@ import type { Post } from "~/features/posts/posts.ts";
 import { TAGS } from "~/features/posts/tags.ts";
 import { SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "~/site.ts";
 
-/** The pages that are not posts, in sitemap order. */
-const PAGES = ["/", "/posts", "/about", "/now", ...TAGS.map((tag) => `/posts/tags/${tag}`)];
+/** The date a post last changed. */
+function modified(post: Post) {
+	return post.updated ?? post.date;
+}
+
+/** The newest change among the posts, or `undefined` with none. */
+function newest(posts: Post[]) {
+	return posts
+		.map((post) => modified(post))
+		.toSorted()
+		.at(-1);
+}
 
 const XML_ESCAPES: Record<string, string> = {
 	"&": "&amp;",
@@ -35,18 +45,19 @@ export function rssFeed(posts: Post[]) {
 <link>${absoluteUrl(post.href)}</link>
 <guid isPermaLink="true">${absoluteUrl(post.href)}</guid>
 <description>${escapeXml(post.description)}</description>
+<dc:creator>${escapeXml(SITE_NAME)}</dc:creator>
 <pubDate>${rssDate(post.date)}</pubDate>
 ${post.tags.map((tag) => `<category>${tag}</category>`).join("\n")}
 </item>`,
 	);
 	return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
 <channel>
 <title>${escapeXml(SITE_NAME)}</title>
 <link>${absoluteUrl("/")}</link>
 <description>${escapeXml(SITE_DESCRIPTION)}</description>
 <language>en-US</language>
-<atom:link href="${absoluteUrl("/rss.xml")}" rel="self" type="application/rss+xml"/>
+${posts.length > 0 ? `<lastBuildDate>${rssDate(newest(posts) ?? "")}</lastBuildDate>\n` : ""}<atom:link href="${absoluteUrl("/rss.xml")}" rel="self" type="application/rss+xml"/>
 ${items.join("\n")}
 </channel>
 </rss>
@@ -84,25 +95,57 @@ ${list}
 - [About](${absoluteUrl("/about")}): who Cody is.
 - [Now](${absoluteUrl("/now")}): what Cody is shipping this month.
 - [RSS](${absoluteUrl("/rss.xml")}): the feed of every post.
+
+## Optional
+
+- [Every post in full](${absoluteUrl("/llms-full.txt")}): the markdown of every post in one file.
 `;
 }
 
+/** One sitemap URL, with the date it last changed and its preview image when it has them. */
+function sitemapUrl({
+	path,
+	lastmod,
+	image,
+}: {
+	path: string;
+	lastmod?: string | undefined;
+	image?: string | undefined;
+}) {
+	const parts = [
+		`<loc>${absoluteUrl(path)}</loc>`,
+		lastmod == null ? "" : `<lastmod>${lastmod}</lastmod>`,
+		image == null ? "" : `<image:image><image:loc>${absoluteUrl(image)}</image:loc></image:image>`,
+	];
+	return `<url>${parts.join("")}</url>`;
+}
+
 /**
- * Makes `sitemap.xml` for the pages and the posts.
+ * Makes `sitemap.xml` for the pages and the posts. A list page changes when a
+ * post in it does, so it takes the newest post's date.
  *
  * @example
  * sitemap(posts); // => '<?xml version="1.0" encoding="UTF-8"?><urlset ...>'
  */
 export function sitemap(posts: Post[]) {
 	const urls = [
-		...PAGES.map((path) => `<url><loc>${absoluteUrl(path)}</loc></url>`),
-		...posts.map(
-			(post) =>
-				`<url><loc>${absoluteUrl(post.href)}</loc><lastmod>${post.updated ?? post.date}</lastmod></url>`,
+		sitemapUrl({ path: "/", lastmod: newest(posts) }),
+		sitemapUrl({ path: "/posts", lastmod: newest(posts) }),
+		sitemapUrl({ path: "/about" }),
+		sitemapUrl({ path: "/now" }),
+		// Why only tags with posts: an empty tag page is noindex.
+		...TAGS.filter((tag) => posts.some((post) => post.tags.includes(tag))).map((tag) =>
+			sitemapUrl({
+				path: `/posts/tags/${tag}`,
+				lastmod: newest(posts.filter((post) => post.tags.includes(tag))),
+			}),
+		),
+		...posts.map((post) =>
+			sitemapUrl({ path: post.href, lastmod: modified(post), image: post.image?.src }),
 		),
 	];
 	return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.join("\n")}
 </urlset>
 `;

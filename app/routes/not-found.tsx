@@ -4,10 +4,13 @@ import { pageMeta } from "~/features/seo/page-meta.ts";
 
 import type { Route } from "./+types/not-found";
 
-export const meta: Route.MetaFunction = () => [
-	...pageMeta({ title: "Not found", description: "This page does not exist.", path: "/404" }),
-	{ name: "robots", content: "noindex" },
-];
+export const meta: Route.MetaFunction = () =>
+	pageMeta({
+		title: "Not found",
+		description: "This page does not exist.",
+		path: "/404",
+		noindex: true,
+	});
 
 export default function NotFound() {
 	return (

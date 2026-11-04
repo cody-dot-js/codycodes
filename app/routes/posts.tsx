@@ -2,6 +2,7 @@ import { PostList } from "~/components/post-list.tsx";
 import { TagNav } from "~/components/tag-nav.tsx";
 import { posts } from "~/features/posts/posts.server.ts";
 import { toSummaries } from "~/features/posts/summaries.ts";
+import { IDS, blogJsonLd } from "~/features/seo/json-ld.ts";
 import { pageMeta } from "~/features/seo/page-meta.ts";
 
 import type { Route } from "./+types/posts";
@@ -10,11 +11,15 @@ export function loader() {
 	return { posts: toSummaries(posts) };
 }
 
-export const meta: Route.MetaFunction = () =>
+export const meta: Route.MetaFunction = ({ loaderData }) =>
 	pageMeta({
 		title: "Posts",
 		description: "Every post on codycod.es, newest first.",
 		path: "/posts",
+		pageType: "CollectionPage",
+		crumbs: [{ name: "Posts", path: "/posts" }],
+		pageSchema: { mainEntity: { "@id": IDS.blog } },
+		schema: [blogJsonLd(loaderData.posts)],
 	});
 
 export default function Posts({ loaderData }: Route.ComponentProps) {

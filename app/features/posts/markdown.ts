@@ -26,3 +26,23 @@ export function toMarkdownTwin({ post, source }: { post: Post; source: string })
 	].filter((fact) => fact !== false);
 	return `# ${post.title}\n\n> ${post.description}\n\n${facts.join(" · ")}\n\n${body}\n`;
 }
+
+const CODE_FENCE = /^```[\s\S]*?^```$/gmu;
+const JSX_TAG = /<\/?[A-Z][^>]*>/gu;
+
+/**
+ * Counts the words a reader reads in a post: the body without the frontmatter,
+ * the imports, the code fences, and the JSX tags. The text inside a component,
+ * such as a `Btw`, counts.
+ *
+ * @example
+ * wordCount("---\ntitle: Hi\n---\nOne two.\n```ts\nconst x = 1;\n```\n"); // => 2
+ */
+export function wordCount(source: string) {
+	const prose = source
+		.replace(FRONTMATTER, "")
+		.replace(MDX_IMPORTS, "")
+		.replaceAll(CODE_FENCE, " ")
+		.replaceAll(JSX_TAG, " ");
+	return prose.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu)?.length ?? 0;
+}

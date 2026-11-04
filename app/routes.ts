@@ -42,6 +42,7 @@ export default [
 	),
 	route("rss.xml", "routes/rss.ts"),
 	route("llms.txt", "routes/llms.ts"),
+	route("llms-full.txt", "routes/llms-full.ts"),
 	route("sitemap.xml", "routes/sitemap.ts"),
 	route("robots.txt", "routes/robots.ts"),
 ] satisfies RouteConfig;

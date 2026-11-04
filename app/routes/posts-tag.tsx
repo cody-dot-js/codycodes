@@ -6,6 +6,7 @@ import { postsWithTag } from "~/features/posts/posts.ts";
 import { posts } from "~/features/posts/posts.server.ts";
 import { toSummaries } from "~/features/posts/summaries.ts";
 import { isTag } from "~/features/posts/tags.ts";
+import { postListJsonLd } from "~/features/seo/json-ld.ts";
 import { pageMeta } from "~/features/seo/page-meta.ts";
 
 import type { Route } from "./+types/posts-tag";
@@ -22,6 +23,14 @@ export const meta: Route.MetaFunction = ({ loaderData }) =>
 		title: `${loaderData.tag} posts`,
 		description: `Posts on codycod.es tagged ${loaderData.tag}, newest first.`,
 		path: `/posts/tags/${loaderData.tag}`,
+		pageType: "CollectionPage",
+		crumbs: [
+			{ name: "Posts", path: "/posts" },
+			{ name: loaderData.tag, path: `/posts/tags/${loaderData.tag}` },
+		],
+		pageSchema: { mainEntity: postListJsonLd(loaderData.posts) },
+		// Why: a tag with no posts is a thin page, so it stays out of search until it has one.
+		noindex: loaderData.posts.length === 0,
 	});
 
 export default function PostsTag({ loaderData }: Route.ComponentProps) {

@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+
 import { MDXProvider } from "@mdx-js/react";
 import { useMemo } from "react";
 import type { LoaderFunctionArgs, MetaFunction } from "react-router";
@@ -6,8 +8,11 @@ import { z } from "zod";
 
 import { CodeBlock } from "~/components/mdx/code-block.tsx";
 
+import { wordCount } from "~/features/posts/markdown.ts";
 import { findPost } from "~/features/posts/posts.server.ts";
+import { blogPostingJsonLd } from "~/features/seo/json-ld.ts";
 import { pageMeta } from "~/features/seo/page-meta.ts";
+import { SITE_IMAGE, absoluteUrl } from "~/site.ts";
 import { TableOfContents } from "~/features/toc/table-of-contents.tsx";
 
 /** The MDX elements that a post renders with a component. */
@@ -22,7 +27,7 @@ const postHandleSchema = z.object({
 });
 
 // Why no `+types` import: with no posts, the route is not in the config, so typegen writes no types.
-export function loader({ url }: LoaderFunctionArgs) {
+export async function loader({ url }: LoaderFunctionArgs) {
 	const post = findPost(url.pathname.replace(/^\/posts\//u, ""));
 	if (post == null) {
 		throw data(null, { status: 404, statusText: "Not Found" });
@@ -40,6 +45,8 @@ export function loader({ url }: LoaderFunctionArgs) {
 		title,
 		updated,
 		video,
+		// Why a relative path: the loader runs only in the prerender pass, from the repo root.
+		wordCount: wordCount(await readFile(post.file, "utf8")),
 	};
 }
 
@@ -53,8 +60,22 @@ export const meta: MetaFunction<typeof loader> = ({ loaderData }) =>
 				type: "article",
 				image: loaderData.image,
 				video: loaderData.video,
+				crumbs: [
+					{ name: "Posts", path: "/posts" },
+					{ name: loaderData.title, path: loaderData.href },
+				],
+				schema: [
+					blogPostingJsonLd({
+						post: loaderData,
+						wordCount: loaderData.wordCount,
+						image: absoluteUrl(loaderData.image?.src ?? SITE_IMAGE.src),
+					}),
+				],
 				extra: [
 					{ property: "article:published_time", content: loaderData.date },
+					{ property: "article:modified_time", content: loaderData.updated ?? loaderData.date },
+					{ property: "article:author", content: absoluteUrl("/about") },
+					...loaderData.tags.map((tag) => ({ property: "article:tag", content: tag })),
 					{
 						tagName: "link",
 						rel: "alternate",
@@ -77,6 +98,10 @@ export default function PostLayout() {
 		<article className="grid gap-10">
 			<header className="grid gap-4">
 				<p className="flex flex-wrap gap-x-3 font-mono text-xs tracking-wider text-label uppercase">
+					{/* Why a byline: the page names its author, as its JSON-LD does. */}
+					<Link to="/about" rel="author" className="hover:text-ink">
+						Cody Price
+					</Link>
 					<time dateTime={post.date}>{post.date}</time>
 					{post.updated != null && (
 						<span>

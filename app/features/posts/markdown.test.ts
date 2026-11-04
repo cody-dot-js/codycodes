@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { toMarkdownTwin } from "./markdown.ts";
+import { toMarkdownTwin, wordCount } from "./markdown.ts";
 import { parsePosts } from "./posts.ts";
 
 const [post] = parsePosts({
@@ -33,5 +33,13 @@ describe("toMarkdownTwin", () => {
 		expect(toMarkdownTwin({ post, source })).toContain(
 			`\`\`\`tsx\nimport { TruncatedText } from "@ngrok/mantle/truncated-text";\n\`\`\``,
 		);
+	});
+});
+
+describe("wordCount", () => {
+	it("counts the prose and the text in components, not the code or the tags", () => {
+		const source = `---\ntitle: Hi\n---\n\nimport { Btw } from "~/components/mdx/btw.tsx";\n\nOne two, three's.\n\n\`\`\`ts\nconst skipped = "a b c";\n\`\`\`\n\n<Btw>\n  Four five.\n</Btw>\n`;
+
+		expect(wordCount(source)).toBe(5);
 	});
 });
