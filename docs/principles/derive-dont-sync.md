@@ -19,4 +19,4 @@ Compute a value from the source that already holds it. Do not copy it into a sec
 - [`app/features/posts/posts.server.ts`](../../app/features/posts/posts.server.ts) derives the post index from an `import.meta.glob` of `content/posts/*/post.mdx`, and [`files.server.ts`](../../app/features/posts/files.server.ts) derives the routes and prerender paths from the same folders.
 - [`app/redirects.ts`](../../app/redirects.ts) is the one redirect table.
 
-**Enforced by:** a test that checks `vercel.json` against [`app/redirects.ts`](../../app/redirects.ts); review for the rest.
+**Enforced by:** review. [`server.ts`](../../server.ts) reads the one redirect table, so there is no copy to drift.

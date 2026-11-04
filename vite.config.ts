@@ -1,3 +1,5 @@
+import { appServer } from "@ngrok/app-server/vite";
+import { vercel } from "@ngrok/app-server/vercel/vite";
 import mdx from "@mdx-js/rollup";
 import rehypeShiki from "@shikijs/rehype";
 import { reactRouter } from "@react-router/dev/vite";
@@ -48,6 +50,8 @@ export default defineConfig({
 			providerImportSource: "@mdx-js/react",
 		}),
 		reactRouter(),
+		// Why the host from the environment: Vercel's build gets the vercel host, and a local build runs on node.
+		appServer(process.env.VERCEL === "1" ? { host: vercel() } : {}),
 	],
 	resolve: {
 		// Why an alias as well as `tsconfigPaths`: MDX posts sit outside the tsconfig `include`.

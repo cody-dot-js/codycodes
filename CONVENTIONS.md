@@ -99,7 +99,7 @@ A rule tagged `(lint: name)` has an oxlint check, and the lint message says why 
 
 - `app/features/posts/schema.ts` is the frontmatter contract. A new field needs a reader: a page, a feed, or a twin that uses it.
 - Each derived file (the post list, the tag pages, `rss.xml`, `sitemap.xml`, `llms.txt`, and each `.md` twin) comes from `posts.server.ts`. Never hand-write one.
-- `app/redirects.ts` is the one redirect table. `vercel.json` must match it.
+- `app/redirects.ts` is the one redirect table. `server.ts` gives it to the server.
 
 ## Testing
 

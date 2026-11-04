@@ -4,6 +4,10 @@
 # within an hour.
 # see: https://pnpm.io/settings#minimumreleaseage
 minimumReleaseAge: 360
+# Why: Cody publishes @ngrok/app-server, and this site adopts each release the day it ships.
+# Only the exact version skips the wait.
+minimumReleaseAgeExclude:
+  - "@ngrok/app-server@0.3.0"
 
 # Don't let pnpm switch itself to package.json#packageManager or record its own
 # version in pnpm-lock.yaml. mise and pnpm/action-setup already pin the version.

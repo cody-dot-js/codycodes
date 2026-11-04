@@ -17,6 +17,6 @@ When you replace an API, move every caller to the new one, then remove the old o
 
 - The callers are the routes, the components, the posts, and the tests.
 - When a post moves, add the old URL to [`app/redirects.ts`](../../app/redirects.ts) and delete the old copy.
-- [`docs/app-server.md`](../app-server.md) is the plan for the move to `@ngrok/app-server`. Each step removes what the server replaces.
+- The move to `@ngrok/app-server` deleted what the server replaced in the same change: the headers and redirects in `vercel.json`, their drift test, the `404.html` copy, and the static preview script.
 
-**Enforced by:** `pnpm run typecheck`, because a stale caller fails to compile once the old API is gone; the redirect test for moved posts.
+**Enforced by:** `pnpm run typecheck`, because a stale caller fails to compile once the old API is gone.

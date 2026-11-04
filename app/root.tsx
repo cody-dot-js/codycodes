@@ -11,6 +11,7 @@ import {
 import type { Route } from "./+types/root";
 import { SwimmingFavicon } from "./features/favicon/swimming-favicon.tsx";
 import { SITE_NAME, X_HANDLE } from "./site.ts";
+import { staleBuild } from "./stale-build.ts";
 
 import geistUrl from "@fontsource-variable/geist/wght.css?url";
 import jetbrainsMonoUrl from "@fontsource-variable/jetbrains-mono/wght.css?url";
@@ -26,6 +27,9 @@ export const links: Route.LinksFunction = () => [
 	{ rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
 	{ rel: "manifest", href: "/site.webmanifest" },
 ];
+
+/** Loads the target of a navigation as a document when the tab knows of a newer build. */
+export const clientMiddleware = [staleBuild.middleware];
 
 export function Layout({ children }: { children: ReactNode }) {
 	return (

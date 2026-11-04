@@ -17,7 +17,7 @@ export default [
 		route("now", "routes/now.tsx"),
 		// Why one route for each post: the route module is the MDX file, so the router loads the
 		// post before it renders. The prerendered HTML holds the whole post. Why only with posts:
-		// `ssr: false` stops the build on a loader that no prerendered path reaches.
+		// a layout with no child routes would only add a loader that no path reaches.
 		...(postFiles.length > 0
 			? [
 					layout(

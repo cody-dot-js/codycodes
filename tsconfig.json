@@ -6,6 +6,7 @@
     "content/**/*.tsx",
     "scripts/**/*.ts",
     "*.config.ts",
+    "server.ts",
     ".react-router/types/**/*"
   ],
   "compilerOptions": {

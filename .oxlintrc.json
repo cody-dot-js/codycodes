@@ -186,12 +186,15 @@
       }
     },
     {
-      // Why: React Router loads a route module, and the tools load a config, by its default export.
+      // Why: React Router loads a route module and its entries, app-server loads `server.ts`, and the
+      // tools load a config, each by its default export.
       "files": [
         "app/root.tsx",
         "app/routes.ts",
         "app/routes/**",
         "content/*/*/demo.tsx",
+        "app/entry.server.tsx",
+        "server.ts",
         "*.config.ts"
       ],
       "rules": {
@@ -206,6 +209,13 @@
       "rules": {
         "react/only-export-components": "off",
         "react/no-multi-comp": "off"
+      }
+    },
+    {
+      // Why: React Router calls the server entry with four arguments. The framework owns that contract.
+      "files": ["app/entry.server.tsx"],
+      "rules": {
+        "eslint/max-params": "off"
       }
     }
   ]
