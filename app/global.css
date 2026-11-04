@@ -252,7 +252,7 @@ html[data-over-shrimp="true"] * {
  * other. The arm and each foot are clipped copies
  * of the happy frame, and the body has a hole where each one sits. The boxes
  * are shares of the sprite. He never turns around, because a mirror would put
- * "ngrok" backward on his hoodie. The time matches `NUG_WALK_MS` in `nug.tsx`.
+ * "ngrok" backward on his hoodie. The time matches `NUG_WALK_MS` in `beat.ts`.
  * No walk with reduced motion.
  */
 @keyframes nug-walk {

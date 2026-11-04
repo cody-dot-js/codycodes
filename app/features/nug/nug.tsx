@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { BAYER_4, HEART } from "~/features/dither/dither.ts";
 
+import { NUG_WALK_MS, playNugBeat } from "./beat.ts";
+
 import calm176 from "./nug-calm-176.png";
 import calm88 from "./nug-calm-88.png";
 import happy176 from "./nug-happy-176.png";
@@ -23,8 +25,6 @@ const HEART_RISE = 0.16;
 const NUG_WALK_PETS = 3;
 /** The parts that move on their own in the nug walk. Each is a clipped copy of the happy frame. */
 const LIMBS = ["arm", "left-foot", "right-foot"] as const;
-/** How long one nug walk lasts, in milliseconds. `nug-walk` in `global.css` uses the same time. */
-const NUG_WALK_MS = 2400;
 
 /** Draws the heart of each fresh pet, risen and dithered away by its age. */
 function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: number) {
@@ -56,7 +56,8 @@ function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: numb
  * the HTML, so the first pet shows at once. The heart's cells are 2 CSS px, as
  * the 3D shrimp's are, so its canvas holds half his size. Three quick pets
  * start the nug walk, his plug walk: he bounces on each beat, shuffles, swings
- * his thumb arm, and kicks his feet in turn, in sprite steps.
+ * his thumb arm, and kicks his feet in turn, in sprite steps, to one bar of
+ * an original trap beat.
  *
  * @example
  * <Nug size={176} className="justify-self-center" />
@@ -109,6 +110,7 @@ export function Nug({ size, className }: { size: 88 | 176; className: string }) 
 		if (pets.current.length === NUG_WALK_PETS) {
 			walkStart.current = now;
 			setWalking(true);
+			playNugBeat();
 		}
 		play.current?.();
 	}, []);
