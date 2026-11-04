@@ -36,12 +36,14 @@ export function Btw({ children }: { children: ReactNode }) {
 	}, []);
 
 	return (
-		<aside className="btw grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-3 rounded-2xl border-2 border-dotted border-label/40 py-3 pr-4 pl-1 sm:grid-cols-[8rem_minmax(0,1fr)]">
-			{/* Why a fixed box: the shrimp mounts later, and the aside must not move when he does. */}
+		<aside className="btw grid grid-cols-[6.5rem_minmax(0,1fr)] items-start gap-3 rounded-2xl border-2 border-dotted border-label/40 pt-10 pr-4 pb-4 pl-1 sm:grid-cols-[8rem_minmax(0,1fr)]">
+			{/* Why a fixed box: the shrimp mounts later, and the aside must not move when he does.
+			    Why the top padding on the aside and the text: his speech bubble floats above his head, inside
+			    the aside, and above the text. */}
 			<div ref={shrimpRef} className="relative aspect-square">
 				{near && <ShrimpTank says="psst." className="relative size-full" />}
 			</div>
-			<div className="grid gap-2 text-[0.95rem] text-label">
+			<div className="grid gap-2 pt-7 text-[0.95rem] text-label">
 				<p className="font-mono text-xs tracking-wider text-blush uppercase">btw</p>
 				{children}
 			</div>

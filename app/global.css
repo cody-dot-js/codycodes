@@ -199,3 +199,16 @@ html[data-over-shrimp="true"] * {
 	mix-blend-mode: screen;
 	mask-image: radial-gradient(ellipse 54% 50% at 52% 50%, black 58%, transparent 99%);
 }
+
+/* The speech tail's dots flow from the bubble down to the shrimp. A still tail with reduced motion. */
+@keyframes speech-tail-flow {
+	to {
+		stroke-dashoffset: 6.5;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.speech-tail {
+		animation: speech-tail-flow 0.9s linear infinite;
+	}
+}
