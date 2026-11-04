@@ -46,6 +46,11 @@
 		border-radius: 4px;
 	}
 
+	/* Why: Tailwind's preflight gives a button the default cursor. Every control here shows the pointer. */
+	:where(a[href], button:not(:disabled), [role="button"], summary, label[for], select) {
+		cursor: pointer;
+	}
+
 	::selection {
 		background: var(--color-blush);
 		color: var(--color-abyss-3);
