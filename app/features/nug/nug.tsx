@@ -19,6 +19,10 @@ const PET_MS = 1400;
 const THUMB = { x: 0.205, y: 0.43 } as const;
 /** How far a heart rises, as a share of his height. */
 const HEART_RISE = 0.16;
+/** How many fresh pets start his plug walk. */
+const PLUG_WALK_PETS = 3;
+/** How long one plug walk lasts, in milliseconds. `nug-plug-walk` in `global.css` uses the same time. */
+const PLUG_WALK_MS = 2400;
 
 /** Draws the heart of each fresh pet, risen and dithered away by its age. */
 function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: number) {
@@ -48,7 +52,8 @@ function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: numb
  * colors. A pet (a click, or Enter on the focused button) shuts his eyes in a
  * happy `^ ^` and floats a pixel heart up from his thumb. Both faces are in
  * the HTML, so the first pet shows at once. The heart's cells are 2 CSS px, as
- * the 3D shrimp's are, so its canvas holds half his size.
+ * the 3D shrimp's are, so its canvas holds half his size. Three quick pets
+ * start his plug walk: a strut from side to side, in sprite steps.
  *
  * @example
  * <Nug size={176} className="justify-self-center" />
@@ -57,7 +62,9 @@ export function Nug({ size, className }: { size: 88 | 176; className: string }) 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const pets = useRef<number[]>([]);
 	const play = useRef<(() => void) | null>(null);
+	const walkStart = useRef(Number.NEGATIVE_INFINITY);
 	const [happy, setHappy] = useState(false);
+	const [walking, setWalking] = useState(false);
 
 	useEffect(() => {
 		const context = canvasRef.current?.getContext("2d");
@@ -66,13 +73,15 @@ export function Nug({ size, className }: { size: 88 | 176; className: string }) 
 		}
 		let frame = 0;
 		let running = false;
-		// Why a loop only while a pet is fresh: a still Nug costs no frames.
+		// Why a loop only while a pet is fresh or he struts: a still Nug costs no frames.
 		function tick(now: number) {
 			pets.current = pets.current.filter((start) => now - start < PET_MS);
 			if (context != null) {
 				drawHearts(context, pets.current, now);
 			}
-			running = pets.current.length > 0;
+			const strutting = now - walkStart.current < PLUG_WALK_MS;
+			setWalking(strutting);
+			running = pets.current.length > 0 || strutting;
 			setHappy(running);
 			if (running) {
 				frame = requestAnimationFrame(tick);
@@ -91,7 +100,13 @@ export function Nug({ size, className }: { size: 88 | 176; className: string }) 
 	}, []);
 
 	const pet = useCallback(() => {
-		pets.current.push(performance.now());
+		const now = performance.now();
+		pets.current.push(now);
+		// Why only the third: more pets during the walk do not start it again.
+		if (pets.current.length === PLUG_WALK_PETS) {
+			walkStart.current = now;
+			setWalking(true);
+		}
 		play.current?.();
 	}, []);
 
@@ -100,6 +115,7 @@ export function Nug({ size, className }: { size: 88 | 176; className: string }) 
 			type="button"
 			aria-label="Pet Nug"
 			onClick={pet}
+			data-plug-walk={walking || undefined}
 			className={`nug relative block shrink-0 ${className}`}
 		>
 			<img

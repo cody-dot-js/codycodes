@@ -245,6 +245,61 @@ html[data-over-shrimp="true"] * {
 	}
 }
 
+/*
+ * Nug's plug walk, after three quick pets: he leans, bounces, and struts out
+ * and back each way, in sprite steps. The time matches `PLUG_WALK_MS` in
+ * `nug.tsx`. No walk with reduced motion.
+ */
+@keyframes nug-plug-walk {
+	0%,
+	100% {
+		translate: 0 0;
+		rotate: 0deg;
+		scale: 1 1;
+	}
+	12.5% {
+		translate: -4% -6%;
+		rotate: -8deg;
+		scale: 1 1;
+	}
+	25% {
+		translate: -8% 0;
+		rotate: -8deg;
+		scale: 1 1;
+	}
+	37.5% {
+		translate: -4% -6%;
+		rotate: 8deg;
+		scale: -1 1;
+	}
+	50% {
+		translate: 0 0;
+		rotate: 0deg;
+		scale: -1 1;
+	}
+	62.5% {
+		translate: 4% -6%;
+		rotate: 8deg;
+		scale: -1 1;
+	}
+	75% {
+		translate: 8% 0;
+		rotate: 8deg;
+		scale: -1 1;
+	}
+	87.5% {
+		translate: 4% -6%;
+		rotate: -8deg;
+		scale: 1 1;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.nug[data-plug-walk] {
+		animation: nug-plug-walk 2.4s steps(1);
+	}
+}
+
 /* The CTA card's grid: the ocean's 24 px rhythm in faint label blue. */
 .cta-grid {
 	background-image:
