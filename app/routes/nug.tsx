@@ -20,8 +20,8 @@ export default function WhoIsNug() {
 				<Nug size={176} className="justify-self-center rounded-xl" />
 				<div className="grid gap-4">
 					<p>
-						This is Nug. He&apos;s a shrimp in an ngrok hoodie and a sailor cap, and he&apos;s here
-						to help you shrimp.
+						This is Nug. He&apos;s a shrimp in an ngrok hoodie and a captain&apos;s hat, and
+						he&apos;s here to help you shrimp.
 					</p>
 					<p>
 						When a post has a side note you can skip, Nug says it: extra context, some prior art, or
@@ -31,7 +31,10 @@ export default function WhoIsNug() {
 			</div>
 			<p>A side note from Nug looks like this:</p>
 			<NugSays>
-				<p>Click me. I float a heart for every pet, and I close my eyes when I&apos;m happy.</p>
+				<p>
+					<em>To shrimp</em> is a play on <em>to ship</em>, which is why I wear a captain&apos;s
+					hat. At ngrok, we like to say we&apos;re shrimping all the time. Click me for a heart.
+				</p>
 			</NugSays>
 		</div>
 	);
