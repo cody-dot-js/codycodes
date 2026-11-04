@@ -27,18 +27,18 @@
   },
   "ignorePatterns": ["build", ".react-router", "node_modules"],
   "rules": {
-    "codycodes/descriptive-names": "error",
-    "codycodes/img-dimensions": "error",
-    "codycodes/multiline-exports": "error",
-    "codycodes/no-barrel-files": "error",
-    "codycodes/no-boolean-positional-param": "error",
-    "codycodes/no-jsx-null-ternary": "error",
-    "codycodes/no-react-hooks-suppression": "error",
-    "codycodes/prefer-function-declaration": "error",
-    "codycodes/prefer-null-check": "error",
-    "codycodes/prefer-type-alias": "error",
-    "codycodes/prefer-url-parse": "error",
-    "codycodes/require-suppression-reason": "error",
+    "codydotjs/descriptive-names": "error",
+    "codydotjs/img-dimensions": "error",
+    "codydotjs/multiline-exports": "error",
+    "codydotjs/no-barrel-files": "error",
+    "codydotjs/no-boolean-positional-param": "error",
+    "codydotjs/no-jsx-null-ternary": "error",
+    "codydotjs/no-react-hooks-suppression": "error",
+    "codydotjs/prefer-function-declaration": "error",
+    "codydotjs/prefer-null-check": "error",
+    "codydotjs/prefer-type-alias": "error",
+    "codydotjs/prefer-url-parse": "error",
+    "codydotjs/require-suppression-reason": "error",
 
     // Options that match the code's idioms.
     "eqeqeq": ["error", "always", { "null": "never" }],
@@ -161,9 +161,9 @@
     {
       "files": ["**/*.test.ts", "**/*.test.tsx"],
       "rules": {
-        "codycodes/no-config-teardown": "error",
-        "codycodes/no-only-to-be-defined": "error",
-        "codycodes/no-sleep-in-tests": "error",
+        "codydotjs/no-config-teardown": "error",
+        "codydotjs/no-only-to-be-defined": "error",
+        "codydotjs/no-sleep-in-tests": "error",
         // Why: a stub next to its test reads better than one at module scope.
         "unicorn/consistent-function-scoping": "off",
         // Why: a test casts a stub to the type that the code under test takes.

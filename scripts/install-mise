@@ -8,7 +8,7 @@ MISE_EXPECTED_VERSION="${MISE_VERSION#v}"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
-    echo "codycodes: missing required command: $1" >&2
+    echo "codydotjs: missing required command: $1" >&2
     return 1
   fi
 }
@@ -23,12 +23,12 @@ require_bootstrap_commands() {
   done
 
   if ! command -v sha256sum >/dev/null 2>&1 && ! command -v shasum >/dev/null 2>&1; then
-    echo "codycodes: missing required command: sha256sum or shasum" >&2
+    echo "codydotjs: missing required command: sha256sum or shasum" >&2
     missing=1
   fi
 
   if [ "${missing}" -ne 0 ]; then
-    echo "codycodes: install the missing command(s), then re-run ./scripts/install-mise." >&2
+    echo "codydotjs: install the missing command(s), then re-run ./scripts/install-mise." >&2
     exit 1
   fi
 }
@@ -39,7 +39,7 @@ sha256_file() {
   elif command -v shasum >/dev/null 2>&1; then
     shasum -a 256 "$1" | awk '{print $1}'
   else
-    echo "codycodes: missing required command: sha256sum or shasum" >&2
+    echo "codydotjs: missing required command: sha256sum or shasum" >&2
     exit 1
   fi
 }
@@ -94,12 +94,12 @@ detect_mise_platform() {
       ;;
     Darwin) os="macos" ;;
     MINGW*|MSYS*|CYGWIN*)
-      echo "codycodes: automatic mise install is not supported from Windows Git Bash/MSYS/Cygwin." >&2
+      echo "codydotjs: automatic mise install is not supported from Windows Git Bash/MSYS/Cygwin." >&2
       echo "       Use WSL, or install mise ${MISE_VERSION} manually and re-run ./scripts/install-mise." >&2
       return 1
       ;;
     *)
-      echo "codycodes: unsupported OS for automatic mise install: ${os}" >&2
+      echo "codydotjs: unsupported OS for automatic mise install: ${os}" >&2
       return 1
       ;;
   esac
@@ -108,7 +108,7 @@ detect_mise_platform() {
     x86_64|amd64) arch="x64" ;;
     arm64|aarch64) arch="arm64" ;;
     *)
-      echo "codycodes: unsupported architecture for automatic mise install: ${arch}" >&2
+      echo "codydotjs: unsupported architecture for automatic mise install: ${arch}" >&2
       return 1
       ;;
   esac
@@ -140,13 +140,13 @@ install_pinned_mise() {
 
   expected_sha256="$(awk -v asset="./${mise_asset}" '$2 == asset {print $1}' "${tmpdir}/SHASUMS256.txt")"
   if [ -z "${expected_sha256}" ]; then
-    echo "codycodes: checksum not found for mise release asset ${mise_asset}" >&2
+    echo "codydotjs: checksum not found for mise release asset ${mise_asset}" >&2
     exit 1
   fi
 
   actual_sha256="$(sha256_file "${tmpdir}/mise")"
   if [ "${actual_sha256}" != "${expected_sha256}" ]; then
-    echo "codycodes: checksum verification failed for mise ${MISE_VERSION}" >&2
+    echo "codydotjs: checksum verification failed for mise ${MISE_VERSION}" >&2
     exit 1
   fi
 
@@ -162,16 +162,16 @@ ensure_pinned_mise() {
   require_command awk || exit 1
 
   if ! command -v mise >/dev/null 2>&1; then
-    echo "codycodes: installing mise ${MISE_VERSION}..."
+    echo "codydotjs: installing mise ${MISE_VERSION}..."
     install_pinned_mise
     export PATH="${HOME}/.local/bin:${PATH}"
   else
     installed_mise_version="$(mise_version mise)"
     if [ "${installed_mise_version}" != "${MISE_EXPECTED_VERSION}" ]; then
       if [ -n "${installed_mise_version}" ]; then
-        echo "codycodes: found mise ${installed_mise_version}, installing ${MISE_VERSION}..."
+        echo "codydotjs: found mise ${installed_mise_version}, installing ${MISE_VERSION}..."
       else
-        echo "codycodes: found mise with unknown version, installing ${MISE_VERSION}..."
+        echo "codydotjs: found mise with unknown version, installing ${MISE_VERSION}..."
       fi
       install_pinned_mise
       export PATH="${HOME}/.local/bin:${PATH}"
@@ -180,7 +180,7 @@ ensure_pinned_mise() {
 
   active_mise_version="$(mise_version mise)"
   if [ "${active_mise_version}" != "${MISE_EXPECTED_VERSION}" ]; then
-    echo "codycodes: mise ${MISE_EXPECTED_VERSION} is required, but $(mise --version) is active" >&2
+    echo "codydotjs: mise ${MISE_EXPECTED_VERSION} is required, but $(mise --version) is active" >&2
     echo "       ensure ${HOME}/.local/bin appears before other mise installs on PATH." >&2
     exit 1
   fi
@@ -205,9 +205,9 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
   fi
   if [ "${caller_mise_version}" != "${MISE_EXPECTED_VERSION}" ]; then
     if [ -n "${caller_mise}" ]; then
-      echo "codycodes: mise ${MISE_EXPECTED_VERSION} is installed at ${HOME}/.local/bin/mise, but your shell resolves ${caller_mise} (${caller_mise_version:-unknown version})." >&2
+      echo "codydotjs: mise ${MISE_EXPECTED_VERSION} is installed at ${HOME}/.local/bin/mise, but your shell resolves ${caller_mise} (${caller_mise_version:-unknown version})." >&2
     else
-      echo "codycodes: mise ${MISE_EXPECTED_VERSION} is installed at ${HOME}/.local/bin/mise, but ${HOME}/.local/bin is not on your PATH." >&2
+      echo "codydotjs: mise ${MISE_EXPECTED_VERSION} is installed at ${HOME}/.local/bin/mise, but ${HOME}/.local/bin is not on your PATH." >&2
     fi
     echo "       Put ${HOME}/.local/bin first on your PATH and activate mise, e.g. for zsh:" >&2
     echo "         echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ~/.zshrc" >&2

@@ -16,4 +16,4 @@ Write code and prose that a reader understands in one pass. Choose plain names, 
 
 **In this repo:** [CONVENTIONS.md § Code Quality](../../CONVENTIONS.md#code-quality), [CONVENTIONS.md § Writing](../../CONVENTIONS.md#writing), and the `simplified-technical-english` skill.
 
-**Enforced by:** oxfmt; oxlint with `codycodes/descriptive-names`, `codycodes/no-boolean-positional-param`, `codycodes/no-jsx-null-ternary`, and `codycodes/prefer-function-declaration` from [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/); review for the rest.
+**Enforced by:** oxfmt; oxlint with `codydotjs/descriptive-names`, `codydotjs/no-boolean-positional-param`, `codydotjs/no-jsx-null-ternary`, and `codydotjs/prefer-function-declaration` from [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/); review for the rest.

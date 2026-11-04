@@ -17,4 +17,4 @@ Assert what a reader or a caller sees: the rendered text, a role and its name, a
 
 **In this repo:** [CONVENTIONS.md § Testing](../../CONVENTIONS.md#testing). Tests run in vitest with Testing Library and happy-dom, and query the page as a reader does.
 
-**Enforced by:** oxlint with `codycodes/no-only-to-be-defined`, `codycodes/no-config-teardown`, and `codycodes/no-sleep-in-tests` from [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/); review for the rest.
+**Enforced by:** oxlint with `codydotjs/no-only-to-be-defined`, `codydotjs/no-config-teardown`, and `codydotjs/no-sleep-in-tests` from [`scripts/oxlint-rules/`](../../scripts/oxlint-rules/); review for the rest.

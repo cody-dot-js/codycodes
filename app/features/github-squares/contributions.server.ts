@@ -13,7 +13,7 @@ const CONTRIBUTIONS_URL = `https://github.com/users/${GITHUB_HANDLE}/contributio
  */
 export async function fetchContributions() {
 	const response = await fetch(CONTRIBUTIONS_URL, {
-		headers: { "User-Agent": "codycod.es build" },
+		headers: { "User-Agent": "codydotjs.dev build" },
 	});
 	if (!response.ok) {
 		throw new Error(`${CONTRIBUTIONS_URL} answered ${response.status}.`);
