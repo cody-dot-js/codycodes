@@ -6,7 +6,8 @@ import type { Route } from "./+types/nug";
 export const meta: Route.MetaFunction = () =>
 	pageMeta({
 		title: "Who is Nug?",
-		description: "Nug is the shrimp in the ngrok hoodie. He leaves the side notes in posts here.",
+		description:
+			'Nug is the "official" unofficial ngrok mascot: the shrimp in the ngrok hoodie. He leaves the side notes in posts here.',
 		path: "/nug",
 		crumbs: [{ name: "Who is Nug?", path: "/nug" }],
 	});
