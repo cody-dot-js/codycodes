@@ -5,10 +5,13 @@ export const HAPPY_LINES = [
 	"♥",
 	"that's the spot.",
 	"shrimp approved.",
+	"just shrimp it!",
+	"shell yeah.",
+	"prawn to be wild.",
+	"shrimply the best.",
+	"don't be shellfish. again!",
 	"receipts or it didn't happen.",
-	"ship it.",
-	"10/10 pet.",
-	"again!",
+	"10/10 pet. would swim again.",
 ] as const;
 
 /** The line after `pets` pets. Why cycle, not random: prerendered HTML and tests stay stable. */

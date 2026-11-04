@@ -21,6 +21,8 @@ import {
 	WebGLRenderer,
 } from "three";
 
+import { shortestTurn } from "./angles.ts";
+import { stepSpring } from "./spring.ts";
 import {
 	//,
 	DITHER_FRAGMENT_SHADER,
@@ -207,8 +209,14 @@ function bodyRadii(progress: number): Radii {
 export function mountShrimpTank({
 	tank,
 	bubbles: bubbleCanvas,
+	speech,
 	onPet,
-}: ShrimpTankEvents & { tank: HTMLButtonElement; bubbles: HTMLCanvasElement }): ShrimpTank | null {
+}: ShrimpTankEvents & {
+	tank: HTMLButtonElement;
+	bubbles: HTMLCanvasElement;
+	/** The speech bubble's anchor. The scene moves it to the head on each frame. */
+	speech: HTMLElement;
+}): ShrimpTank | null {
 	let renderer: WebGLRenderer;
 	try {
 		renderer = new WebGLRenderer({ alpha: true, antialias: false });
@@ -497,8 +505,14 @@ export function mountShrimpTank({
 		beat: number;
 		energy: number;
 	}) {
-		// The abdomen flexes, and the tail curls more on each power stroke.
-		const flex = 0.05 * Math.sin(time * 1.1) + 0.1 * energy * Math.sin(beat * 0.5);
+		// Why straighten at speed: a shrimp swims forward on its swimmerets with the abdomen held out
+		// straight and the tail fan open. A curl of the abdomen is the backward escape flip, so the
+		// abdomen only breathes at rest and ripples a little with each power stroke.
+		const swimming = smoothstep({ from: 0.2, to: 0.8, value: energy });
+		const flex =
+			0.05 * Math.sin(time * 1.1) * (1 - swimming) -
+			0.24 * swimming +
+			0.025 * swimming * Math.sin(beat);
 		const pivot = restingSpine[3] ?? new Vector3();
 		const weights = [0.45, 0.75, 1];
 		for (const [offset, weight] of weights.entries()) {
@@ -542,7 +556,8 @@ export function mountShrimpTank({
 			});
 		}
 
-		// The walking legs: the hip under the carapace, the knee out and down, the foot forward.
+		// The walking legs: the hip under the carapace, the knee out and down, the foot forward. While he
+		// swims, they fold back and in along the body, out of the flow.
 		for (const walker of walkers) {
 			spineFrame(walker.progress);
 			const [, radiusDown, radiusSide] = bodyRadii(walker.progress);
@@ -550,18 +565,25 @@ export function mountShrimpTank({
 				.copy(frame.center)
 				.addScaledVector(frame.up, -radiusDown * 0.75)
 				.addScaledVector(frame.across, walker.side * radiusSide * 0.55);
-			const sway = 0.04 * Math.sin(whisker + walker.pair * 0.8 + (walker.side > 0 ? 0 : 1.3));
-			const trail = 0.18 * energy;
+			const sway =
+				0.04 * (1 - swimming) * Math.sin(whisker + walker.pair * 0.8 + (walker.side > 0 ? 0 : 1.3));
+			const trail = 0.34 * swimming;
 			const length = walker.pair < 2 ? 0.48 : 0.42;
 			const knee = hip
 				.clone()
-				.add(new Vector3(-0.06 + sway + trail * 0.5, -length * 0.5, walker.side * 0.16));
+				.add(
+					new Vector3(
+						-0.06 + sway + trail * 0.5,
+						-length * 0.5 * (1 - 0.45 * swimming),
+						walker.side * 0.16 * (1 - 0.5 * swimming),
+					),
+				);
 			const foot = knee
 				.clone()
 				.add(
 					new Vector3(
 						-0.12 + walker.pair * 0.05 + sway + trail,
-						-length * 0.55,
+						-length * 0.55 * (1 - 0.6 * swimming),
 						walker.side * 0.05,
 					),
 				);
@@ -592,12 +614,17 @@ export function mountShrimpTank({
 			swimmeret.tip.rotation.z = 0.25 + 0.5 * fold;
 		}
 
-		// The tail fan sits at the end of the spine and spreads with the beat.
+		// The tail fan sits at the end of the spine. It opens wide and holds still while he swims, as a
+		// rudder, and folds a little at rest.
 		spineFrame(1);
 		tail.position.copy(frame.center);
 		tail.rotation.set(0, 0, Math.atan2(frame.tangent.y, frame.tangent.x));
 		for (const { pivot: leafPivot, spread } of fan) {
-			leafPivot.rotation.set(0, spread * (1 + 0.15 * energy * Math.sin(beat * 0.5)), 0);
+			leafPivot.rotation.set(
+				0,
+				spread * (0.75 + 0.4 * swimming + 0.04 * (1 - swimming) * Math.sin(time * 1.7)),
+				0,
+			);
 		}
 	}
 
@@ -622,13 +649,20 @@ export function mountShrimpTank({
 		happy: 0,
 		nextBlink: 2 + Math.random() * 3,
 		blinkAt: -1,
-		/** How much he follows the cursor, 0 to 1, and where to. */
+		/** How much he follows the cursor, 0 to 1. */
 		follow: 0,
-		followX: 0,
-		followY: 0,
+		/** His offset from home, on a spring in each axis. */
+		swimX: { position: 0, velocity: 0 },
+		swimY: { position: 0, velocity: 0 },
+		/** The side he faces while he follows: -1 left, 1 right. */
+		facing: -1,
 		yaw: 0,
 	};
-	const cursor = { x: 0, y: 0, near: false };
+	/**
+	 * Where he swims to. `until` is the `motion.time` when a touch stops counting; a mouse stays
+	 * until it leaves.
+	 */
+	const cursor = { x: 0, y: 0, near: false, until: Number.POSITIVE_INFINITY };
 	const viewport = { width: 1, height: 1, pixelRatio: 1 };
 	const bubbles: {
 		kind: "bubble" | "heart";
@@ -681,6 +715,21 @@ export function mountShrimpTank({
 	}
 
 	const headPosition = new Vector3();
+	// Why a fixed width: reading the bubble's width on each frame would force a layout.
+	const speechMaxWidth = 260;
+	/** Moves the speech anchor to the head, so the bubble's tail points at him as he swims. */
+	function placeSpeech() {
+		const [eye] = eyes;
+		if (eye == null) {
+			return;
+		}
+		eye.getWorldPosition(headPosition);
+		headPosition.project(camera);
+		const x = ((headPosition.x + 1) / 2) * viewport.width;
+		const y = ((1 - headPosition.y) / 2) * viewport.height;
+		const left = MathUtils.clamp(x - 10, 0, Math.max(0, viewport.width - speechMaxWidth));
+		speech.style.transform = `translate3d(${left.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+	}
 	function spawnHearts(count: number) {
 		const [eye] = eyes;
 		if (eye == null) {
@@ -787,7 +836,14 @@ export function mountShrimpTank({
 		}
 		motion.nudge = Math.max(0, motion.nudge - delta * 1.4);
 		const speed = motion.speed / maxSpeed;
-		const wantedEnergy = Math.max(speed, 0.3 * motion.hover, motion.nudge, 0.08);
+		const followSpeed = Math.hypot(motion.swimX.velocity, motion.swimY.velocity);
+		const wantedEnergy = Math.max(
+			speed,
+			0.3 * motion.hover,
+			motion.nudge,
+			Math.min(1, followSpeed / 2),
+			0.08,
+		);
 		motion.energy += (wantedEnergy - motion.energy) * Math.min(1, delta * 4);
 		motion.whisker += delta * TAU * (0.22 + 0.5 * motion.energy);
 		motion.beat += delta * TAU * (0.5 + 2.6 * motion.energy);
@@ -796,18 +852,39 @@ export function mountShrimpTank({
 		poseEyes(delta);
 
 		// He follows a near cursor only while he rests, so a lap always comes home.
-		const wantedFollow = cursor.near && motion.target === 0 && !reducedMotion.matches ? 1 : 0;
-		motion.follow += (wantedFollow - motion.follow) * Math.min(1, delta * 2.5);
-		if (cursor.near) {
-			motion.followX += (cursor.x - motion.followX) * Math.min(1, delta * 1.8);
-			motion.followY += (cursor.y - motion.followY) * Math.min(1, delta * 1.8);
+		const following =
+			cursor.near && motion.time < cursor.until && motion.target === 0 && !reducedMotion.matches;
+		// Why slow in: he notices the cursor over most of a second, then commits. He lets go faster.
+		motion.follow +=
+			((following ? 1 : 0) - motion.follow) * Math.min(1, delta * (following ? 1.6 : 2));
+		// Why a spring that stiffens as he commits: the first approach is a gentle ease, and after that
+		// he tracks each cursor move quickly and smoothly. With no cursor, the spring takes him home.
+		const response = 2.4 + 5.6 * motion.follow * motion.follow;
+		motion.swimX = stepSpring({
+			state: motion.swimX,
+			target: following ? cursor.x : 0,
+			response,
+			delta,
+		});
+		motion.swimY = stepSpring({
+			state: motion.swimY,
+			target: following ? cursor.y : 0,
+			response,
+			delta,
+		});
+		// Why a dead zone: he turns only for a clear move, so a small jitter never flips him.
+		const lead = following ? cursor.x - motion.swimX.position : motion.swimX.velocity;
+		if (motion.swimX.velocity > 0.25 || lead > 0.3) {
+			motion.facing = 1;
+		} else if (motion.swimX.velocity < -0.25 || lead < -0.3) {
+			motion.facing = -1;
 		}
 
 		const sine = Math.sin(motion.angle);
 		const cosine = Math.cos(motion.angle);
 		orbit.position.set(
-			-lapWidth * sine + motion.follow * motion.followX,
-			-0.12 * lapWidth * sine + 0.08 * Math.sin(motion.time * 1.3) + motion.follow * motion.followY,
+			-lapWidth * sine + motion.swimX.position,
+			-0.12 * lapWidth * sine + 0.08 * Math.sin(motion.time * 1.3) + motion.swimY.position,
 			-lapDepth * (1 - cosine),
 		);
 		// Face the way he swims. The head points to -x, so a yaw of `a` sends it to (-cos a, 0, sin a).
@@ -815,14 +892,21 @@ export function mountShrimpTank({
 		const idle =
 			(0.35 + 0.25 * Math.sin(motion.time * 0.45)) * (1 - speed) +
 			0.25 * motion.hover * (1 - speed);
-		// Why turn around: the head points to -x, so a cursor on his right needs a yaw of about π.
-		const towardCursor = cursor.x > motion.followX - 0.2 ? Math.PI - 0.35 : 0.35;
-		const wantedYaw = heading + idle + motion.follow * (towardCursor - idle);
-		motion.yaw += (wantedYaw - motion.yaw) * Math.min(1, delta * 3);
+		// Why turn around: the head points to -x, so swimming right needs a yaw of about π. He faces
+		// his swim side while he follows, and while the spring carries him home after.
+		const side = motion.facing === 1 ? Math.PI - 0.35 : 0.35;
+		const steer = Math.max(motion.follow, Math.min(1, Math.abs(motion.swimX.velocity)));
+		const wantedYaw = heading + idle + steer * (side - idle);
+		// Why the short way: the lap heading wraps from −π to π at the back of the tank. A plain
+		// lerp there spins him almost a full turn backward.
+		motion.yaw += shortestTurn({ from: motion.yaw, to: wantedYaw }) * Math.min(1, delta * 4);
 		orbit.rotation.y = motion.yaw;
 		bank.rotation.x = -0.4 * speed + 0.25 * motion.nudge * Math.sin(motion.time * 20);
-		bank.rotation.z = 0.04 * Math.sin(motion.time * 1.3 + 1) + 0.06 * speed;
+		// Why pitch with the climb: his nose leads up or down, so a follow reads as swimming, not sliding.
+		const climb = MathUtils.clamp(motion.swimY.velocity / 1.5, -1, 1);
+		bank.rotation.z = 0.04 * Math.sin(motion.time * 1.3 + 1) + 0.06 * speed - 0.35 * climb;
 		glow.position.set(orbit.position.x, -1.15, orbit.position.z);
+		placeSpeech();
 
 		renderer.render(scene, camera);
 		if (
@@ -911,11 +995,52 @@ export function mountShrimpTank({
 		}
 		wake();
 	}
-	// Why on the window: the tank sits behind the page text, so the page gets the pointer first. A
-	// click counts when it lands on the shrimp and not on a link or a button.
-	function handleWindowClick(event: MouseEvent) {
-		if (event.detail > 0 && !isInteractive(event.target) && onShrimp(event)) {
+	/** Aims him at a pointer that is near him but not on him. Call it after `onShrimp`. */
+	function aimAt({ event, over }: { event: PointerEvent; over: boolean }) {
+		const rect = tank.getBoundingClientRect();
+		orbit.getWorldPosition(headPosition);
+		headPosition.project(camera);
+		const shrimpX = rect.left + ((headPosition.x + 1) / 2) * rect.width;
+		const shrimpY = rect.top + ((1 - headPosition.y) / 2) * rect.height;
+		cursor.near = Math.hypot(event.clientX - shrimpX, event.clientY - shrimpY) < FOLLOW_RADIUS;
+		// Why hold still while the pointer is on him: a shrimp that slides away is hard to pet.
+		if (cursor.near && !over) {
+			// Why stop short: he swims toward the pointer, not onto it, and stays inside his tank.
+			cursor.x = MathUtils.clamp(pointer.x * 2.4 * 0.7, -1.6, 1.6);
+			cursor.y = MathUtils.clamp(pointer.y * 0.9 * 0.7, -0.45, 0.45);
+		}
+	}
+	// Why pointer events on the window: the tank sits behind the page text, so the page gets the
+	// pointer first. iOS Safari sends no `click` for a tap on a plain element, but it sends
+	// `pointerup`. A tap counts when it lands on the shrimp and not on a link or a button.
+	const press = { x: 0, y: 0, time: 0, active: false };
+	function handlePointerDown(event: PointerEvent) {
+		press.x = event.clientX;
+		press.y = event.clientY;
+		press.time = event.timeStamp;
+		press.active = event.isPrimary;
+	}
+	function handlePointerUp(event: PointerEvent) {
+		const tap =
+			press.active &&
+			Math.hypot(event.clientX - press.x, event.clientY - press.y) < 12 &&
+			event.timeStamp - press.time < 600;
+		press.active = false;
+		if (!tap || isInteractive(event.target)) {
+			return;
+		}
+		const over = onShrimp(event);
+		if (over) {
 			pet();
+			return;
+		}
+		// Why a touch timer: a finger leaves no hover, so a tap near him draws him over for a while.
+		if (event.pointerType !== "mouse") {
+			aimAt({ event, over });
+			cursor.until = motion.time + 3;
+			if (cursor.near) {
+				wake();
+			}
 		}
 	}
 	// A key press on the focused tank (detail 0) always counts.
@@ -925,6 +1050,10 @@ export function mountShrimpTank({
 		}
 	}
 	function handlePointerMove(event: PointerEvent) {
+		// Why mouse only: a touch move scrolls the page; it is not a cursor to follow.
+		if (event.pointerType !== "mouse") {
+			return;
+		}
 		const rect = tank.getBoundingClientRect();
 		if (rect.bottom < 0 || rect.top > innerHeight) {
 			return;
@@ -932,17 +1061,8 @@ export function mountShrimpTank({
 		const over = onShrimp(event) && !isInteractive(event.target);
 		document.documentElement.dataset.overShrimp = String(over);
 		motion.hover = over ? 1 : 0;
-		orbit.getWorldPosition(headPosition);
-		headPosition.project(camera);
-		const shrimpX = rect.left + ((headPosition.x + 1) / 2) * rect.width;
-		const shrimpY = rect.top + ((1 - headPosition.y) / 2) * rect.height;
-		cursor.near = Math.hypot(event.clientX - shrimpX, event.clientY - shrimpY) < FOLLOW_RADIUS;
-		// Why hold still while the cursor is on him: a shrimp that slides away from the cursor is hard to pet.
-		if (cursor.near && !over) {
-			// Why stop short: he swims toward the cursor, not onto it, and stays inside his tank.
-			cursor.x = MathUtils.clamp(pointer.x * 2.4 * 0.7, -1.6, 1.6);
-			cursor.y = MathUtils.clamp(pointer.y * 0.9 * 0.7, -0.45, 0.45);
-		}
+		cursor.until = Number.POSITIVE_INFINITY;
+		aimAt({ event, over });
 		if (over || cursor.near) {
 			wake();
 		}
@@ -954,7 +1074,8 @@ export function mountShrimpTank({
 	}
 
 	tank.addEventListener("click", handleKeyClick);
-	addEventListener("click", handleWindowClick);
+	addEventListener("pointerdown", handlePointerDown, { passive: true });
+	addEventListener("pointerup", handlePointerUp, { passive: true });
 	addEventListener("pointermove", handlePointerMove, { passive: true });
 	document.documentElement.addEventListener("pointerleave", handlePointerLeave);
 	document.addEventListener("visibilitychange", wake);
@@ -979,7 +1100,8 @@ export function mountShrimpTank({
 		dispose() {
 			cancelAnimationFrame(loop.frame);
 			tank.removeEventListener("click", handleKeyClick);
-			removeEventListener("click", handleWindowClick);
+			removeEventListener("pointerdown", handlePointerDown);
+			removeEventListener("pointerup", handlePointerUp);
 			removeEventListener("pointermove", handlePointerMove);
 			document.documentElement.removeEventListener("pointerleave", handlePointerLeave);
 			delete document.documentElement.dataset.overShrimp;

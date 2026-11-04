@@ -27,18 +27,24 @@ type TankStatus = "loading" | "ready" | "no-webgl";
 export function ShrimpTank({ says, className }: { says?: string; className: string }) {
 	const tankRef = useRef<HTMLButtonElement>(null);
 	const bubblesRef = useRef<HTMLCanvasElement>(null);
+	const speechRef = useRef<HTMLParagraphElement>(null);
 	const [status, setStatus] = useState<TankStatus>("loading");
 	const [pets, setPets] = useState(0);
 
 	useEffect(() => {
 		const tank = tankRef.current;
 		const bubbles = bubblesRef.current;
-		if (tank == null || bubbles == null) {
+		const speech = speechRef.current;
+		if (tank == null || bubbles == null || speech == null) {
 			return;
 		}
 		let dispose: (() => void) | undefined;
 		let unmounted = false;
-		async function mount(target: { tank: HTMLButtonElement; bubbles: HTMLCanvasElement }) {
+		async function mount(target: {
+			tank: HTMLButtonElement;
+			bubbles: HTMLCanvasElement;
+			speech: HTMLParagraphElement;
+		}) {
 			let sceneModule: Awaited<ReturnType<typeof loadScene>>;
 			try {
 				sceneModule = await loadScene();
@@ -54,7 +60,7 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 			dispose = scene?.dispose;
 			setStatus(scene == null ? "no-webgl" : "ready");
 		}
-		void mount({ tank, bubbles });
+		void mount({ tank, bubbles, speech });
 		return () => {
 			unmounted = true;
 			dispose?.();
@@ -81,8 +87,17 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 					</span>
 				)}
 			</button>
-			<p aria-live="polite" className="pointer-events-none absolute top-[10%] left-[16%] z-20">
-				{status === "ready" && <SpeechBubble>{line}</SpeechBubble>}
+			{/* Why a zero-size anchor: the scene moves it to his head, and the bubble sits above it. */}
+			<p
+				ref={speechRef}
+				aria-live="polite"
+				className="pointer-events-none absolute top-0 left-0 z-20 size-0 will-change-transform"
+			>
+				{status === "ready" && (
+					<span className="absolute bottom-9 left-0 w-max">
+						<SpeechBubble>{line}</SpeechBubble>
+					</span>
+				)}
 			</p>
 		</div>
 	);
