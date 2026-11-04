@@ -10,9 +10,9 @@ image:
 video: /posts/keep-the-tail/card.mp4
 ---
 
-import { Btw } from "~/components/mdx/btw.tsx";
 import { LiveDemo } from "~/components/mdx/live-demo.tsx";
 import { NgrokCta } from "~/components/mdx/ngrok-cta.tsx";
+import { NugSays } from "~/components/mdx/nug-says.tsx";
 
 Put three endpoint IDs in a narrow column with [`text-overflow: ellipsis`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-overflow), and all three read `ep_2abcdEFGhijKL…`. The ellipsis eats the end of each ID, and the end is the only part that tells them apart.
 
@@ -30,10 +30,10 @@ In the right-hand column, try these:
 - Copy a clipped ID and paste it somewhere. You get the whole ID on one line, with no ellipsis in it.
 - Hover a clipped ID, or Tab to it, to read the whole value in a tooltip.
 
-<Btw>
+<NugSays>
   The frame runs [`@ngrok/mantle`](https://www.npmjs.com/package/@ngrok/mantle) 0.93.7 from npm, not
   a copy of it. mantle is [open source](https://github.com/ngrok/mantle) under the MIT license.
-</Btw>
+</NugSays>
 
 ## Long URLs, without the tricks
 
@@ -115,11 +115,11 @@ So the two visible halves are [`aria-hidden`](https://developer.mozilla.org/en-U
 
 The hidden copy has [`user-select: none`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/user-select), so one click still copies the value once, not twice. [`translate="no"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/translate) keeps a browser's translate feature away from a value you're meant to copy.
 
-<Btw>
+<NugSays>
   Browser translation rewrites the page's text nodes behind React's back. React has had an [open
   issue about it since 2017](https://github.com/facebook/react/issues/11538). An ID never needs
   translating, so the component opts out.
-</Btw>
+</NugSays>
 
 ## What it costs
 

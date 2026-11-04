@@ -16,6 +16,7 @@ export default [
 		route("posts/tags/:tag", "routes/posts-tag.tsx"),
 		route("about", "routes/about.tsx"),
 		route("now", "routes/now.tsx"),
+		route("nug", "routes/nug.tsx"),
 		// Why one route for each post: the route module is the MDX file, so the router loads the
 		// post before it renders. The prerendered HTML holds the whole post. Why only with posts:
 		// a layout with no child routes would only add a loader that no path reaches.

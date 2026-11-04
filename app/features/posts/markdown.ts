@@ -33,7 +33,7 @@ const JSX_TAG = /<\/?[A-Z][^>]*>/gu;
 /**
  * Counts the words a reader reads in a post: the body without the frontmatter,
  * the imports, the code fences, and the JSX tags. The text inside a component,
- * such as a `Btw`, counts.
+ * such as a `NugSays`, counts.
  *
  * @example
  * wordCount("---\ntitle: Hi\n---\nOne two.\n```ts\nconst x = 1;\n```\n"); // => 2

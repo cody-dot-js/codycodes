@@ -94,6 +94,7 @@ ${list}
 
 - [About](${absoluteUrl("/about")}): who Cody is.
 - [Now](${absoluteUrl("/now")}): what Cody is shipping this month.
+- [Who is Nug?](${absoluteUrl("/nug")}): the shrimp who leaves the side notes in posts.
 - [RSS](${absoluteUrl("/rss.xml")}): the feed of every post.
 
 ## Optional
@@ -133,6 +134,7 @@ export function sitemap(posts: Post[]) {
 		sitemapUrl({ path: "/posts", lastmod: newest(posts) }),
 		sitemapUrl({ path: "/about" }),
 		sitemapUrl({ path: "/now" }),
+		sitemapUrl({ path: "/nug" }),
 		// Why only tags with posts: an empty tag page is noindex.
 		...TAGS.filter((tag) => posts.some((post) => post.tags.includes(tag))).map((tag) =>
 			sitemapUrl({

@@ -38,7 +38,7 @@ describe("toMarkdownTwin", () => {
 
 describe("wordCount", () => {
 	it("counts the prose and the text in components, not the code or the tags", () => {
-		const source = `---\ntitle: Hi\n---\n\nimport { Btw } from "~/components/mdx/btw.tsx";\n\nOne two, three's.\n\n\`\`\`ts\nconst skipped = "a b c";\n\`\`\`\n\n<Btw>\n  Four five.\n</Btw>\n`;
+		const source = `---\ntitle: Hi\n---\n\nimport { NugSays } from "~/components/mdx/nug-says.tsx";\n\nOne two, three's.\n\n\`\`\`ts\nconst skipped = "a b c";\n\`\`\`\n\n<NugSays>\n  Four five.\n</NugSays>\n`;
 
 		expect(wordCount(source)).toBe(5);
 	});
