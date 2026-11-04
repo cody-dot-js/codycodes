@@ -55,8 +55,8 @@ function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: numb
  * happy `^ ^` and floats a pixel heart up from his thumb. Both faces are in
  * the HTML, so the first pet shows at once. The heart's cells are 2 CSS px, as
  * the 3D shrimp's are, so its canvas holds half his size. Three quick pets
- * start the nug walk, his plug walk: he struts from side to side, pumps his
- * thumb, and steps on each beat, in sprite steps.
+ * start the nug walk, his plug walk: he bounces on each beat, shuffles, swings
+ * his thumb arm, and kicks his feet in turn, in sprite steps.
  *
  * @example
  * <Nug size={176} className="justify-self-center" />
