@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from "react-router";
 
 import { DitherOcean } from "~/features/dither-ocean/dither-ocean.tsx";
+import { FootnoteMotion } from "~/features/footnotes/footnote-motion.tsx";
 import { HeaderShrimp } from "~/features/header-shrimp/header-shrimp.tsx";
 import { X_HANDLE } from "~/site.ts";
 
@@ -30,6 +31,7 @@ export default function SiteLayout() {
 				</header>
 				<main id="main">
 					<Outlet />
+					<FootnoteMotion />
 				</main>
 				<footer className="flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-5 font-mono text-sm text-label">
 					<span>#shrimpfluencing</span>

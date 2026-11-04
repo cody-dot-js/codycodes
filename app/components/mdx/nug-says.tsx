@@ -6,17 +6,14 @@ import { Nug } from "~/features/nug/nug.tsx";
 /**
  * An aside that a reader can skip: extra context from Nug, who sits beside it.
  * A pet makes him happy. The label links to the page about him. The text is in
- * the prerendered HTML; Nug is decoration. Give it an `id` for a `NoteRef` to
- * jump to it.
+ * the prerendered HTML; Nug is decoration.
  *
  * @example
  * <NugSays>mantle is open source, MIT licensed.</NugSays>
  */
-export function NugSays({ id, children }: { id?: string; children: ReactNode }) {
+export function NugSays({ children }: { children: ReactNode }) {
 	return (
 		<aside
-			id={id}
-			data-note
 			aria-label="Nug says"
 			className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 rounded-2xl border-2 border-dotted border-label/40 py-3 pr-5 pl-3"
 		>

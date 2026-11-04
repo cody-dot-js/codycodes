@@ -96,8 +96,8 @@
 		letter-spacing: -0.01em;
 	}
 
-	/* Why no class: a markdown link has none. A component's link, such as a button, keeps its own style. */
-	& a:not([class]) {
+	/* Why no class: a markdown link has none. A component's link, such as a button, and a footnote link keep their own style. */
+	& a:not([class], [data-footnote-ref], [data-footnote-backref]) {
 		color: var(--color-blush);
 		text-decoration: underline;
 		text-underline-offset: 3px;
@@ -132,7 +132,7 @@
 	}
 
 	/* Why: a link to an API's docs keeps the code color, and its underline shows that it is a link. */
-	& a:not([class]):has(> code) {
+	& a:not([class], [data-footnote-ref], [data-footnote-backref]):has(> code) {
 		color: var(--color-label);
 		text-decoration-color: rgb(169 200 209 / 0.5);
 
@@ -253,40 +253,144 @@ html[data-over-shrimp="true"] * {
 	background-size: 24px 24px;
 }
 
-/* A footnote mark: a small pink `?` in a ring. Its hit area is larger than the ring, for a thumb. */
-.note-ref {
+/*
+ * Footnotes. A mark is a small pink number (or `?`) in a ring. The notes sit under a rule at the
+ * end of a post, and each ends with a pink back link. Markdown footnotes (`[^1]`) render this
+ * markup in a post and in any page that renders MDX, such as `/nug`.
+ */
+sup:has(> a[data-footnote-ref]) {
+	line-height: 0;
+}
+
+a[data-footnote-ref] {
+	/* Why: a jump back lands the mark mid-screen, with room above it for the bubbles. */
+	scroll-margin-block: 30vh;
 	position: relative;
 	display: inline-grid;
 	place-items: center;
-	width: 1.25em;
-	height: 1.25em;
+	min-width: 1.35em;
+	height: 1.35em;
 	margin-left: 0.15em;
+	padding-inline: 0.25em;
 	border: 1px solid rgb(255 177 170 / 0.6);
 	border-radius: 999px;
-	vertical-align: super;
 	font-family: var(--font-mono);
-	font-size: 0.65em;
+	font-size: 0.75rem;
 	line-height: 1;
 	color: var(--color-blush);
+	text-decoration: none;
 
-	&::after {
+	/* Why: the ring is small, so the tap area reaches past it, for a thumb. */
+	&::before {
 		content: "";
 		position: absolute;
 		inset: -0.6rem;
 	}
 
-	&:hover {
+	&:hover,
+	&:target {
 		background: var(--color-blush);
 		color: var(--color-abyss-3);
 	}
 }
 
-/* A note that a reader jumped to: a pink ring pulses around it, and its `em` words get a pink underline. */
-[data-note] {
-	scroll-margin-block: 30vh;
+a[data-footnote-backref] {
+	color: var(--color-blush);
+	text-decoration: none;
+	font-family: var(--font-mono);
+
+	&:hover {
+		color: var(--color-ink);
+	}
 }
 
-[data-note]:target {
+.post-body [data-footnotes] {
+	margin-top: 2rem;
+	border-top: 1px solid var(--color-rule);
+	padding-top: 1rem;
+	font-size: 0.92rem;
+	color: var(--color-label);
+
+	& ol {
+		list-style: decimal;
+	}
+
+	& li {
+		scroll-margin-block: 30vh;
+		border-radius: 10px;
+		padding: 0.25rem 0.5rem;
+	}
+
+	& li:target {
+		outline: 1px solid var(--color-blush);
+		color: var(--color-ink);
+	}
+}
+
+/* The bubble that pops around a mark when a reader comes back to it, and the small ones that drift up. */
+.footnote-pop {
+	position: absolute;
+	inset: -0.35rem;
+	border: 1.5px dotted rgb(255 177 170 / 0.9);
+	border-radius: 999px;
+	pointer-events: none;
+	animation: footnote-pop 0.5s ease-out forwards;
+}
+
+.footnote-bubble {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	width: var(--size);
+	height: var(--size);
+	border: 1.5px dotted rgb(169 200 209 / 0.85);
+	border-radius: 999px;
+	pointer-events: none;
+	opacity: 0;
+	animation: footnote-bubble 1.3s var(--delay) ease-out forwards;
+
+	/* The cream glint at the top left, as on the 3D shrimp's bubbles. */
+	&::after {
+		content: "";
+		position: absolute;
+		top: 12%;
+		left: 12%;
+		width: 1.5px;
+		height: 1.5px;
+		background: rgb(255 248 241 / 0.9);
+	}
+}
+
+@keyframes footnote-pop {
+	from {
+		opacity: 1;
+		scale: 0.6;
+	}
+
+	to {
+		opacity: 0;
+		scale: 1.6;
+	}
+}
+
+@keyframes footnote-bubble {
+	0% {
+		opacity: 0;
+		translate: -50% 0;
+	}
+
+	15% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+		translate: calc(-50% + var(--drift)) -2.6rem;
+	}
+}
+
+/* A footnote that a reader jumped to: a pink ring pulses around it, and its `em` words get a pink underline. */
+.post-body [data-footnotes] li:target {
 	border-color: var(--color-blush);
 
 	& em {
@@ -296,7 +400,7 @@ html[data-over-shrimp="true"] * {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	[data-note]:target {
+	.post-body [data-footnotes] li:target {
 		animation: note-ring 1.2s ease-out 2;
 
 		& em {

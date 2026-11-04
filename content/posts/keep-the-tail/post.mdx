@@ -87,7 +87,9 @@ Prose that can lose its end doesn't need it: plain [`text-overflow: ellipsis`](h
 
 I wanted one more thing from the start: at every width, the ellipsis should hug the text as tightly as plain CSS truncate does. When a container narrows, CSS swaps the last characters for `…` right against what's left. A split value is two boxes, and that's where it can fall apart. The head's box ends partway through a character, so a sliver of empty space opens between the ellipsis and the tail, and the sliver changes size with every pixel you drag.
 
-So while a value overflows, the head's width rounds down to whole [`ch`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length#ch) cells. In a monospace font, the last clipped character, the ellipsis, and the tail sit flush at every width, and the ellipsis steps one whole character at a time as the frame narrows. Drag the first demo to watch it. A proportional font still leaves a gap, but it's always narrower than one character.
+So while a value overflows, the head's width rounds down to whole [`ch`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length#ch) cells. In a monospace font, the last clipped character, the ellipsis, and the tail sit flush at every width, and the ellipsis steps one whole character at a time as the frame narrows. Drag the first demo to watch it. A proportional font still leaves a gap, but it's always narrower than one character.[^head]
+
+[^head]: [`head`](https://mantle.ngrok.com/components/data-display/truncated-text/#head-length) rounds the other way, up to whole `ch` cells. So with `head` set, a proportional font can show one more narrow character before the ellipsis.
 
 [Ligatures](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-variant-ligatures) are off for the same reason. JetBrains Mono shapes `//` as one glyph, so a clip inside it dropped both slashes and parked the ellipsis a whole cell away from the text.
 
