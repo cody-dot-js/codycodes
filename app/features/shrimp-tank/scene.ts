@@ -36,11 +36,31 @@ export const MAX_LAPS = 3;
 
 /** What the tank tells its React shell. */
 export type ShrimpTankEvents = {
-	/** Runs after each click that adds a lap, with the total since mount. */
-	onLap: (laps: number) => void;
-	/** Runs when the shrimp is home and the queue is empty. */
-	onRest: () => void;
+	/** Runs after each pet (a click or a key press on the shrimp), with the total since mount. */
+	onPet: (pets: number) => void;
 };
+
+/** CSS px from the shrimp at which he notices the cursor and swims toward it. */
+const FOLLOW_RADIUS = 260;
+
+/** The heart the pets make, as rows of cells. Why 7×6: it reads as a heart at 2 px cells. */
+const HEART = [".##.##.", "#######", "#######", ".#####.", "..###..", "...#..."] as const;
+
+/** A 4×4 Bayer matrix, so a heart fades out in the same ordered dither as the bubbles. */
+const BAYER_4 = [
+	[0, 8, 2, 10],
+	[12, 4, 14, 6],
+	[3, 11, 1, 9],
+	[15, 7, 13, 5],
+] as const;
+
+/** True when a click lands on a link, a button, or a field, which the shrimp must not take. */
+function isInteractive(target: EventTarget | null): boolean {
+	return (
+		target instanceof Element &&
+		target.closest("a, button, input, select, textarea, summary, label") != null
+	);
+}
 
 /** The handle that `mountShrimpTank` returns. */
 export type ShrimpTank = {
@@ -171,22 +191,23 @@ function bodyRadii(progress: number): Radii {
 }
 
 /**
- * Mounts the 3D shrimp in a tank button. Each click on the shrimp, or each
- * keyboard press, queues one lap, up to `MAX_LAPS`. With reduced motion, a
- * click gives a wiggle instead. The loop runs only while the tank is on screen,
- * the tab is visible, and something moves.
+ * Mounts the 3D shrimp in a tank button. A pet (a click on the shrimp, or a key
+ * press on the focused tank) makes him squint, float hearts, and swim a happy
+ * lap, up to `MAX_LAPS` queued. He blinks now and then, and swims toward a
+ * cursor within `FOLLOW_RADIUS`. With reduced motion, a pet gives a wiggle and
+ * two hearts, and he does not follow. The loop runs only while the tank is on
+ * screen and the tab is visible.
  *
  * @returns The handle, or `null` when the browser has no WebGL.
  *
  * @example
- * const tank = mountShrimpTank({ tank: button, bubbles: canvas, onLap, onRest });
+ * const tank = mountShrimpTank({ tank: button, bubbles: canvas, onPet });
  * tank?.dispose();
  */
 export function mountShrimpTank({
 	tank,
 	bubbles: bubbleCanvas,
-	onLap,
-	onRest,
+	onPet,
 }: ShrimpTankEvents & { tank: HTMLButtonElement; bubbles: HTMLCanvasElement }): ShrimpTank | null {
 	let renderer: WebGLRenderer;
 	try {
@@ -201,7 +222,7 @@ export function mountShrimpTank({
 	}
 	renderer.setClearColor(0x000000, 0);
 	renderer.domElement.setAttribute("aria-hidden", "true");
-	renderer.domElement.className = "absolute inset-0 block size-full";
+	renderer.domElement.className = "absolute inset-0 z-[1] block size-full";
 	tank.prepend(renderer.domElement);
 
 	const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -321,9 +342,11 @@ export function mountShrimpTank({
 	});
 	addMesh(model, rostrum.geometry, shellMaterial);
 
-	// The eyes, on short stalks.
+	// The eyes, on short stalks. A blink or a happy squint scales them flat.
+	const eyes: Mesh[] = [];
 	for (const side of [-1, 1]) {
 		const eye = addMesh(model, new SphereGeometry(0.075, 16, 12), eyeMaterial);
+		eyes.push(eye);
 		eye.position.set(-1.08, 0.12, 0.15 * side);
 		const stalk = addMesh(model, new CylinderGeometry(0.03, 0.04, 0.12, 8), limbMaterial);
 		stalk.position.set(-1.06, 0.1, 0.09 * side);
@@ -594,9 +617,21 @@ export function mountShrimpTank({
 		energy: 0.1,
 		hover: 0,
 		time: 0,
+		pets: 0,
+		/** Seconds left in the happy squint after a pet. */
+		happy: 0,
+		nextBlink: 2 + Math.random() * 3,
+		blinkAt: -1,
+		/** How much he follows the cursor, 0 to 1, and where to. */
+		follow: 0,
+		followX: 0,
+		followY: 0,
+		yaw: 0,
 	};
+	const cursor = { x: 0, y: 0, near: false };
 	const viewport = { width: 1, height: 1, pixelRatio: 1 };
 	const bubbles: {
+		kind: "bubble" | "heart";
 		x: number;
 		y: number;
 		radius: number;
@@ -634,6 +669,7 @@ export function mountShrimpTank({
 		const y = ((1 - tailPosition.y) / 2) * viewport.height;
 		for (let index = 0; index < count; index++) {
 			bubbles.push({
+				kind: "bubble",
 				x: x + (Math.random() - 0.5) * 10,
 				y,
 				radius: 2 + Math.random() * 4,
@@ -641,6 +677,50 @@ export function mountShrimpTank({
 				life: 1,
 				phase: Math.random() * TAU,
 			});
+		}
+	}
+
+	const headPosition = new Vector3();
+	function spawnHearts(count: number) {
+		const [eye] = eyes;
+		if (eye == null) {
+			return;
+		}
+		eye.getWorldPosition(headPosition);
+		headPosition.project(camera);
+		const x = ((headPosition.x + 1) / 2) * viewport.width;
+		const y = ((1 - headPosition.y) / 2) * viewport.height;
+		for (let index = 0; index < count; index++) {
+			bubbles.push({
+				kind: "heart",
+				x: x + (Math.random() - 0.5) * 40,
+				y: y - 6 - Math.random() * 14,
+				radius: Math.random() < 0.35 ? 3 : 2,
+				rise: -(34 + Math.random() * 30),
+				life: 1 + Math.random() * 0.3,
+				phase: Math.random() * TAU,
+			});
+		}
+	}
+
+	/** Draws one pixel heart. Cells drop out in Bayer order as it fades, so it dithers away. */
+	function drawHeart({ x, y, cell, life }: { x: number; y: number; cell: number; life: number }) {
+		if (bubbleContext == null) {
+			return;
+		}
+		bubbleContext.fillStyle = "rgb(255, 177, 170)";
+		for (const [row, cells] of HEART.entries()) {
+			for (let column = 0; column < cells.length; column++) {
+				const threshold = (BAYER_4[row % 4]?.[column % 4] ?? 0) / 16;
+				if (cells[column] === "#" && threshold < life) {
+					bubbleContext.fillRect(
+						Math.round(x + (column - 3) * cell),
+						Math.round(y + (row - 3) * cell),
+						cell,
+						cell,
+					);
+				}
+			}
 		}
 	}
 
@@ -660,6 +740,10 @@ export function mountShrimpTank({
 				continue;
 			}
 			const x = bubble.x + 3 * Math.sin(bubble.phase);
+			if (bubble.kind === "heart") {
+				drawHeart({ x, y: bubble.y, cell: bubble.radius, life: Math.min(1, bubble.life) });
+				continue;
+			}
 			const dots = Math.max(6, Math.round(bubble.radius * 2.4));
 			if (bubbleContext == null) {
 				continue;
@@ -700,7 +784,6 @@ export function mountShrimpTank({
 			motion.angle = 0;
 			motion.target = 0;
 			motion.speed = 0;
-			onRest();
 		}
 		motion.nudge = Math.max(0, motion.nudge - delta * 1.4);
 		const speed = motion.speed / maxSpeed;
@@ -710,12 +793,21 @@ export function mountShrimpTank({
 		motion.beat += delta * TAU * (0.5 + 2.6 * motion.energy);
 
 		pose(motion);
+		poseEyes(delta);
+
+		// He follows a near cursor only while he rests, so a lap always comes home.
+		const wantedFollow = cursor.near && motion.target === 0 && !reducedMotion.matches ? 1 : 0;
+		motion.follow += (wantedFollow - motion.follow) * Math.min(1, delta * 2.5);
+		if (cursor.near) {
+			motion.followX += (cursor.x - motion.followX) * Math.min(1, delta * 1.8);
+			motion.followY += (cursor.y - motion.followY) * Math.min(1, delta * 1.8);
+		}
 
 		const sine = Math.sin(motion.angle);
 		const cosine = Math.cos(motion.angle);
 		orbit.position.set(
-			-lapWidth * sine,
-			-0.12 * lapWidth * sine + 0.08 * Math.sin(motion.time * 1.3),
+			-lapWidth * sine + motion.follow * motion.followX,
+			-0.12 * lapWidth * sine + 0.08 * Math.sin(motion.time * 1.3) + motion.follow * motion.followY,
 			-lapDepth * (1 - cosine),
 		);
 		// Face the way he swims. The head points to -x, so a yaw of `a` sends it to (-cos a, 0, sin a).
@@ -723,7 +815,11 @@ export function mountShrimpTank({
 		const idle =
 			(0.35 + 0.25 * Math.sin(motion.time * 0.45)) * (1 - speed) +
 			0.25 * motion.hover * (1 - speed);
-		orbit.rotation.y = heading + idle;
+		// Why turn around: the head points to -x, so a cursor on his right needs a yaw of about π.
+		const towardCursor = cursor.x > motion.followX - 0.2 ? Math.PI - 0.35 : 0.35;
+		const wantedYaw = heading + idle + motion.follow * (towardCursor - idle);
+		motion.yaw += (wantedYaw - motion.yaw) * Math.min(1, delta * 3);
+		orbit.rotation.y = motion.yaw;
 		bank.rotation.x = -0.4 * speed + 0.25 * motion.nudge * Math.sin(motion.time * 20);
 		bank.rotation.z = 0.04 * Math.sin(motion.time * 1.3 + 1) + 0.06 * speed;
 		glow.position.set(orbit.position.x, -1.15, orbit.position.z);
@@ -739,9 +835,28 @@ export function mountShrimpTank({
 		drawBubbles(delta);
 	}
 
+	/** A blink every few seconds, and a long happy squint after a pet. */
+	function poseEyes(delta: number) {
+		motion.happy = Math.max(0, motion.happy - delta);
+		if (motion.time >= motion.nextBlink) {
+			motion.blinkAt = motion.time;
+			motion.nextBlink = motion.time + 2.5 + Math.random() * 4;
+		}
+		const sinceBlink = motion.time - motion.blinkAt;
+		// Why 0.16 s: a real blink takes 100 to 400 ms; a short one reads as cute, not sleepy.
+		const blink =
+			motion.blinkAt >= 0 && sinceBlink < 0.16 ? Math.sin((sinceBlink / 0.16) * Math.PI) : 0;
+		const squint = motion.happy > 0 ? Math.min(1, motion.happy * 6) * 0.8 : 0;
+		const closed = Math.max(blink, squint);
+		for (const eye of eyes) {
+			eye.scale.set(1 + 0.15 * squint, Math.max(0.12, 1 - closed), 1);
+		}
+	}
+
 	// ---------- the loop ----------
 	const loop = { visible: true, running: false, last: 0, frame: 0 };
-	const busy = () => motion.target > motion.angle || motion.nudge > 0 || bubbles.length > 0;
+	const busy = () =>
+		motion.target > motion.angle || motion.nudge > 0 || motion.happy > 0 || bubbles.length > 0;
 	function tick(now: number) {
 		const delta = Math.min(0.05, (now - loop.last) / 1000);
 		loop.last = now;
@@ -780,39 +895,67 @@ export function mountShrimpTank({
 		raycaster.setFromCamera(pointer, camera);
 		return raycaster.intersectObjects([hit, bodyMesh], false).length > 0;
 	}
-	function handleClick(event: MouseEvent) {
-		if (event.detail > 0 && !onShrimp(event)) {
-			return;
-		}
+	function pet() {
+		motion.pets += 1;
+		motion.happy = 0.9;
+		onPet(motion.pets);
 		if (reducedMotion.matches) {
 			motion.nudge = 1;
+			spawnHearts(2);
 			wake();
 			return;
 		}
-		if (Math.ceil((motion.target - motion.angle) / TAU - 1e-6) >= MAX_LAPS) {
-			return;
+		spawnHearts(6);
+		if (Math.ceil((motion.target - motion.angle) / TAU - 1e-6) < MAX_LAPS) {
+			motion.target = motion.target > motion.angle ? motion.target + TAU : TAU;
 		}
-		motion.target = motion.target > motion.angle ? motion.target + TAU : TAU;
-		motion.laps += 1;
-		onLap(motion.laps);
 		wake();
 	}
+	// Why on the window: the tank sits behind the page text, so the page gets the pointer first. A
+	// click counts when it lands on the shrimp and not on a link or a button.
+	function handleWindowClick(event: MouseEvent) {
+		if (event.detail > 0 && !isInteractive(event.target) && onShrimp(event)) {
+			pet();
+		}
+	}
+	// A key press on the focused tank (detail 0) always counts.
+	function handleKeyClick(event: MouseEvent) {
+		if (event.detail === 0) {
+			pet();
+		}
+	}
 	function handlePointerMove(event: PointerEvent) {
-		const over = onShrimp(event);
-		tank.dataset.over = String(over);
+		const rect = tank.getBoundingClientRect();
+		if (rect.bottom < 0 || rect.top > innerHeight) {
+			return;
+		}
+		const over = onShrimp(event) && !isInteractive(event.target);
+		document.documentElement.dataset.overShrimp = String(over);
 		motion.hover = over ? 1 : 0;
-		if (over) {
+		orbit.getWorldPosition(headPosition);
+		headPosition.project(camera);
+		const shrimpX = rect.left + ((headPosition.x + 1) / 2) * rect.width;
+		const shrimpY = rect.top + ((1 - headPosition.y) / 2) * rect.height;
+		cursor.near = Math.hypot(event.clientX - shrimpX, event.clientY - shrimpY) < FOLLOW_RADIUS;
+		if (cursor.near) {
+			// Why stop short: he swims toward the cursor, not onto it, and stays inside his tank.
+			cursor.x = MathUtils.clamp(pointer.x * 2.4 * 0.7, -1.6, 1.6);
+			cursor.y = MathUtils.clamp(pointer.y * 0.9 * 0.7, -0.45, 0.45);
+		}
+		if (over || cursor.near) {
 			wake();
 		}
 	}
 	function handlePointerLeave() {
 		motion.hover = 0;
-		tank.dataset.over = "false";
+		cursor.near = false;
+		document.documentElement.dataset.overShrimp = "false";
 	}
 
-	tank.addEventListener("click", handleClick);
-	tank.addEventListener("pointermove", handlePointerMove);
-	tank.addEventListener("pointerleave", handlePointerLeave);
+	tank.addEventListener("click", handleKeyClick);
+	addEventListener("click", handleWindowClick);
+	addEventListener("pointermove", handlePointerMove, { passive: true });
+	document.documentElement.addEventListener("pointerleave", handlePointerLeave);
 	document.addEventListener("visibilitychange", wake);
 	reducedMotion.addEventListener("change", wake);
 	const intersection = new IntersectionObserver(([entry]) => {
@@ -834,9 +977,11 @@ export function mountShrimpTank({
 	return {
 		dispose() {
 			cancelAnimationFrame(loop.frame);
-			tank.removeEventListener("click", handleClick);
-			tank.removeEventListener("pointermove", handlePointerMove);
-			tank.removeEventListener("pointerleave", handlePointerLeave);
+			tank.removeEventListener("click", handleKeyClick);
+			removeEventListener("click", handleWindowClick);
+			removeEventListener("pointermove", handlePointerMove);
+			document.documentElement.removeEventListener("pointerleave", handlePointerLeave);
+			delete document.documentElement.dataset.overShrimp;
 			document.removeEventListener("visibilitychange", wake);
 			reducedMotion.removeEventListener("change", wake);
 			intersection.disconnect();

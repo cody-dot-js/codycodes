@@ -152,3 +152,24 @@
 		color: var(--color-label);
 	}
 }
+
+/*
+ * The shrimp's dither glow: the ocean's dot pitch (7 px) in label blue, faded out from the
+ * middle, like the wisps around the header shrimp on X.
+ */
+.shrimp-dither {
+	background-image: radial-gradient(circle, rgb(169 200 209 / 0.55) 1px, transparent 1.6px);
+	background-size: 7px 7px;
+	mask-image: radial-gradient(
+		ellipse 50% 46% at 50% 55%,
+		black 0%,
+		rgb(0 0 0 / 0.45) 45%,
+		transparent 100%
+	);
+}
+
+/* Why on the root: the shrimp sits behind the page, so the page element under the cursor owns it. */
+html[data-over-shrimp="true"],
+html[data-over-shrimp="true"] * {
+	cursor: pointer;
+}

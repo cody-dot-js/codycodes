@@ -1,27 +1,34 @@
 import { useEffect, useRef, useState } from "react";
 
+import { lineAfter } from "./lines.ts";
+import { SpeechBubble } from "./speech-bubble.tsx";
+
 /** Loads three.js and the scene in their own chunk. */
 async function loadScene() {
 	return import("./scene.ts");
 }
 
 /** The tank's state: three.js loads, then the scene runs or the browser has no WebGL. */
-type TankStatus = "loading" | "swimming" | "resting" | "no-webgl";
+type TankStatus = "loading" | "ready" | "no-webgl";
 
 /**
- * The home page hero: a 3D shrimp in a tank. A click on the shrimp, or Enter
- * or Space on the focused tank, adds a lap. three.js loads in its own chunk
- * after the first paint, and the tank keeps its size the whole time, so the
- * load moves nothing on the page.
+ * The shrimp. A pet (a click on him, or Enter or Space on the focused tank)
+ * makes him squint, float hearts, swim a happy lap, and say a new line. He
+ * swims toward a near cursor. three.js loads in its own chunk after the first
+ * paint, and the tank keeps its size the whole time, so the load moves nothing.
+ *
+ * The tank takes no pointer events: the scene hit-tests clicks on the window,
+ * so the shrimp can sit behind page text without blocking its links.
+ * `className` places and sizes the tank; it must make a positioned box.
  *
  * @example
- * <ShrimpTank />
+ * <ShrimpTank className="relative h-60 w-96" />
  */
-export function ShrimpTank() {
+export function ShrimpTank({ says, className }: { says?: string; className: string }) {
 	const tankRef = useRef<HTMLButtonElement>(null);
 	const bubblesRef = useRef<HTMLCanvasElement>(null);
 	const [status, setStatus] = useState<TankStatus>("loading");
-	const [laps, setLaps] = useState(0);
+	const [pets, setPets] = useState(0);
 
 	useEffect(() => {
 		const tank = tankRef.current;
@@ -36,25 +43,16 @@ export function ShrimpTank() {
 			try {
 				sceneModule = await loadScene();
 			} catch {
-				// Why recover: the hero is decoration. A chunk that fails to load leaves the text fallback.
+				// Why recover: the shrimp is decoration. A chunk that fails to load leaves the text fallback.
 				setStatus("no-webgl");
 				return;
 			}
 			if (unmounted) {
 				return;
 			}
-			const scene = sceneModule.mountShrimpTank({
-				...target,
-				onLap: (count) => {
-					setLaps(count);
-					setStatus("swimming");
-				},
-				onRest: () => {
-					setStatus("resting");
-				},
-			});
+			const scene = sceneModule.mountShrimpTank({ ...target, onPet: setPets });
 			dispose = scene?.dispose;
-			setStatus(scene == null ? "no-webgl" : "resting");
+			setStatus(scene == null ? "no-webgl" : "ready");
 		}
 		void mount({ tank, bubbles });
 		return () => {
@@ -63,33 +61,28 @@ export function ShrimpTank() {
 		};
 	}, []);
 
+	const line = pets === 0 && says != null ? says : lineAfter(pets);
 	return (
-		<div className="grid gap-3">
+		<div className={className}>
 			<button
 				ref={tankRef}
 				type="button"
-				aria-label="Make the shrimp swim a lap"
-				aria-describedby="shrimp-hint"
-				className="relative block h-[clamp(320px,48vw,480px)] w-full cursor-default rounded-xl data-[over=true]:cursor-pointer"
+				aria-label="Pet the shrimp"
+				className="pointer-events-none absolute inset-0 block rounded-xl"
 			>
-				<canvas
-					ref={bubblesRef}
+				<span
 					aria-hidden="true"
-					className="pointer-events-none absolute inset-0 size-full"
+					className="shrimp-dither absolute inset-[8%] rounded-full opacity-60"
 				/>
+				<canvas ref={bubblesRef} aria-hidden="true" className="absolute inset-0 z-10 size-full" />
 				{status === "no-webgl" && (
-					<span className="absolute inset-0 grid place-items-center font-mono text-sm text-label">
+					<span className="absolute inset-0 grid place-items-center font-mono text-xs text-label">
 						the shrimp needs WebGL
 					</span>
 				)}
 			</button>
-			<p className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-2 border-t border-rule pt-3 font-mono text-sm text-label">
-				<span id="shrimp-hint">
-					{status === "swimming" ? "click again to add a lap, up to 3" : "click the shrimp"}
-				</span>
-				<span aria-live="polite">
-					laps <b className="font-medium text-blush tabular-nums">{laps}</b>
-				</span>
+			<p aria-live="polite" className="pointer-events-none absolute top-0 right-[6%] z-20">
+				{status === "ready" && <SpeechBubble>{line}</SpeechBubble>}
 			</p>
 		</div>
 	);

@@ -4,7 +4,6 @@ import { PostList } from "~/components/post-list.tsx";
 import { posts } from "~/features/posts/posts.server.ts";
 import { toSummaries } from "~/features/posts/summaries.ts";
 import { pageMeta } from "~/features/seo/page-meta.ts";
-import { ShrimpTank } from "~/features/shrimp-tank/shrimp-tank.tsx";
 import { SITE_DESCRIPTION } from "~/site.ts";
 
 import type { Route } from "./+types/home";
@@ -25,14 +24,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 					<h1 className="text-[clamp(2.2rem,6vw,3.4rem)] leading-[1.04] font-semibold tracking-tight text-balance">
 						cody price
 						<br />
-						<span className="text-blush">staff frontend engineer at ngrok.</span>
+						<span className="text-blush">staff product engineer at ngrok.</span>
 					</h1>
 					<p className="max-w-[56ch] text-lg text-label">
 						<b className="font-medium text-ink">frontend perf, design systems, agent tooling.</b>{" "}
 						receipts + trade-offs. i build mantle and ngrok.com.
 					</p>
 				</header>
-				<ShrimpTank />
 			</section>
 			<section className="grid gap-5">
 				<div className="flex items-baseline justify-between gap-4">

@@ -6,7 +6,7 @@ export const SITE_NAME = "Cody Price";
 
 /** The one-line description, for the home page, the feed, and `llms.txt`. */
 export const SITE_DESCRIPTION =
-	"Staff frontend engineer at ngrok. Frontend performance, design systems, and agent tooling.";
+	"Staff product engineer at ngrok. Frontend performance, design systems, and agent tooling.";
 
 /** The X handle, without the `@`. */
 export const X_HANDLE = "codydotjs";

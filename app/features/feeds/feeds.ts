@@ -58,7 +58,7 @@ ${items.join("\n")}
  * See https://llmstxt.org.
  *
  * @example
- * llmsTxt(posts); // => "# Cody Price\n\n> Staff frontend engineer at ngrok. ..."
+ * llmsTxt(posts); // => "# Cody Price\n\n> Staff product engineer at ngrok. ..."
  */
 export function llmsTxt(posts: Post[]) {
 	const list =

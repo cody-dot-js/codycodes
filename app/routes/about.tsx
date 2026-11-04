@@ -5,7 +5,7 @@ import type { Route } from "./+types/about";
 export const meta: Route.MetaFunction = () =>
 	pageMeta({
 		title: "About",
-		description: "Cody Price is a staff frontend engineer at ngrok.",
+		description: "Cody Price is a staff product engineer at ngrok.",
 		path: "/about",
 	});
 
@@ -14,7 +14,7 @@ export default function About() {
 		<div className="post-body">
 			<h1 className="text-4xl font-semibold tracking-tight">Hey y’all 👋</h1>
 			<p>
-				I’m <strong>Cody Price</strong>, a staff frontend engineer at{" "}
+				I’m <strong>Cody Price</strong>, a staff product engineer at{" "}
 				<a href="https://ngrok.com">ngrok</a>. I build <a href="https://mantle.ngrok.com">mantle</a>
 				, ngrok’s design system, and ngrok.com.
 			</p>
