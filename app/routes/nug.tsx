@@ -1,3 +1,4 @@
+import { NoteRef } from "~/components/mdx/note-ref.tsx";
 import { NugSays } from "~/components/mdx/nug-says.tsx";
 import { Nug } from "~/features/nug/nug.tsx";
 import { pageMeta } from "~/features/seo/page-meta.ts";
@@ -21,7 +22,8 @@ export default function WhoIsNug() {
 				<div className="grid gap-4">
 					<p>
 						This is Nug. He&apos;s a shrimp in an ngrok hoodie and a captain&apos;s hat, and
-						he&apos;s here to help you shrimp.
+						he&apos;s here to help you shrimp
+						<NoteRef to="shrimp-note" label="What does shrimp mean?" />.
 					</p>
 					<p>
 						When a post has a side note you can skip, Nug says it: extra context, some prior art, or
@@ -30,7 +32,7 @@ export default function WhoIsNug() {
 				</div>
 			</div>
 			<p>A side note from Nug looks like this:</p>
-			<NugSays>
+			<NugSays id="shrimp-note">
 				<p>
 					<em>To shrimp</em> is a play on <em>to ship</em>, which is why I wear a captain&apos;s
 					hat. At ngrok, we like to say we&apos;re shrimping all the time. Click me for a heart.
