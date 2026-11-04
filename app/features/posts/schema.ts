@@ -22,6 +22,22 @@ export const frontmatterSchema = z.strictObject({
 	updated: z.iso.date().optional(),
 	/** One or more topics from `TAGS` in `tags.ts`. */
 	tags: z.array(z.enum(TAGS)).min(1),
+	/** The link-preview image, in `public/`, and its alt text. Omit it for a text-only preview. */
+	image: z
+		.strictObject({
+			src: z.string().regex(/^\/posts\/[a-z0-9-]+\/[\w-]+\.(?:jpg|png)$/u, {
+				error: "An image is a path in `public/`, such as `/posts/<slug>/card.jpg`.",
+			}),
+			alt: z.string().trim().min(1),
+		})
+		.optional(),
+	/** A 1280x720 MP4 loop of the preview image, in `public/`, for the platforms that play `og:video`. */
+	video: z
+		.string()
+		.regex(/^\/posts\/[a-z0-9-]+\/[\w-]+\.mp4$/u, {
+			error: "A video is a path in `public/`, such as `/posts/<slug>/card.mp4`.",
+		})
+		.optional(),
 	/** The URLs of the copies on other platforms, such as the X Article. Add each one after it ships. */
 	syndication: z.array(z.url({ protocol: /^https$/u })).default([]),
 });

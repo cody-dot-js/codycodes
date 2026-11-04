@@ -49,8 +49,8 @@ export default function SiteLayout() {
 					</span>
 				</footer>
 			</div>
-			{/* Why under the footer: the water fills only the bottom half of the band, so it never sits behind text. */}
-			<div className="pointer-events-none absolute inset-x-0 bottom-0 h-[560px]">
+			{/* Why 720 px: the water fills the bottom half of the band, so its crests rise behind the footer and a little of the page above it. */}
+			<div className="pointer-events-none absolute inset-x-0 bottom-0 h-[720px]">
 				<DitherOcean />
 			</div>
 		</div>

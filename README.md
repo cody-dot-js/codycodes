@@ -1,6 +1,6 @@
 # codycod.es
 
-Cody Price's personal site. Posts are MDX files, and every page is prerendered to static files with React Router 8. The site keeps the dated original of each post; copies on X link back to it.
+Cody Price's personal site. Posts are MDX files. React Router 8 prerenders each known page, and [`@ngrok/app-server`](https://github.com/ngrok/app-server) serves the site. The site keeps the dated original of each post; copies on X link back to it.
 
 Agents: start at [AGENTS.md](./AGENTS.md).
 
@@ -16,13 +16,13 @@ pnpm run dev
 
 ## Commands
 
-| Command            | What it does                                        |
-| ------------------ | --------------------------------------------------- |
-| `pnpm run dev`     | The dev server, with drafts from `content/drafts/`  |
-| `pnpm run build`   | Prerenders every page into `build/client/`          |
-| `pnpm run preview` | Serves `build/client/` the way the static host does |
-| `pnpm run check`   | Format check, lint, typecheck, and tests            |
-| `pnpm run fmt`     | Formats every file with oxfmt                       |
+| Command            | What it does                                       |
+| ------------------ | -------------------------------------------------- |
+| `pnpm run dev`     | The dev server, with drafts from `content/drafts/` |
+| `pnpm run build`   | Prerenders every page into `build/client/`         |
+| `pnpm run preview` | Serves the build through the production pipeline   |
+| `pnpm run check`   | Format check, lint, typecheck, and tests           |
+| `pnpm run fmt`     | Formats every file with oxfmt                      |
 
 ## Layout
 
@@ -31,11 +31,12 @@ pnpm run dev
 - `app/features/feeds/`: `rss.xml`, `sitemap.xml`, and `llms.txt`.
 - `app/features/shrimp-tank/`: the 3D shrimp on the home page.
 - `app/redirects.ts`: the one redirect table.
-- `docs/`: the principles, the decisions, and the [move to `@ngrok/app-server`](./docs/app-server.md).
+- `server.ts`: the server pipeline: redirects, security headers, the CSP, and markdown twins.
+- `docs/`: the principles and the decisions.
 
 ## Deploy
 
-Vercel builds the site with `vercel.json`: `pnpm run build`, then it serves `build/client/` as static files.
+Vercel runs `pnpm run build`. With `VERCEL=1`, the `vercel` host of `@ngrok/app-server` writes `.vercel/output`: one function for the pages, and the CDN for `/assets/`.
 
 - `codycod.es` is the production domain and the canonical origin (`SITE_ORIGIN` in `app/site.ts`).
 - Add `codyaprice.com` to the same Vercel project as a domain that redirects to `codycod.es` (Domains → Redirect to another domain → 308).

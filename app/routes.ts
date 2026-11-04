@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+
 import type { RouteConfig } from "@react-router/dev/routes";
 import { index, layout, route } from "@react-router/dev/routes";
 
@@ -15,7 +17,7 @@ export default [
 		route("now", "routes/now.tsx"),
 		// Why one route for each post: the route module is the MDX file, so the router loads the
 		// post before it renders. The prerendered HTML holds the whole post. Why only with posts:
-		// `ssr: false` stops the build on a loader that no prerendered path reaches.
+		// a layout with no child routes would only add a loader that no path reaches.
 		...(postFiles.length > 0
 			? [
 					layout(
@@ -28,11 +30,19 @@ export default [
 			: []),
 		route("*", "routes/not-found.tsx"),
 	]),
+	// Why outside the site layout: a post embeds its demo in a frame, so the demo has no site chrome.
+	...postFiles.flatMap((post) => {
+		const demo = post.file.replace(/post\.mdx$/u, "demo.tsx");
+		return existsSync(demo)
+			? [route(`posts/${post.slug}/demo`, `../${demo}`, { id: `post-demo/${post.slug}` })]
+			: [];
+	}),
 	...postFiles.map((post) =>
 		route(`posts/${post.slug}.md`, "routes/post-markdown.ts", { id: `post-markdown/${post.slug}` }),
 	),
 	route("rss.xml", "routes/rss.ts"),
 	route("llms.txt", "routes/llms.ts"),
+	route("llms-full.txt", "routes/llms-full.ts"),
 	route("sitemap.xml", "routes/sitemap.ts"),
 	route("robots.txt", "routes/robots.ts"),
 ] satisfies RouteConfig;

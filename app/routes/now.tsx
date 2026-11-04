@@ -7,6 +7,7 @@ export const meta: Route.MetaFunction = () =>
 		title: "Now",
 		description: "What Cody Price is shipping this month.",
 		path: "/now",
+		crumbs: [{ name: "Now", path: "/now" }],
 	});
 
 export default function Now() {

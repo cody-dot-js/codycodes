@@ -1,3 +1,4 @@
+import { IDS } from "~/features/seo/json-ld.ts";
 import { pageMeta } from "~/features/seo/page-meta.ts";
 
 import type { Route } from "./+types/about";
@@ -7,6 +8,9 @@ export const meta: Route.MetaFunction = () =>
 		title: "About",
 		description: "Cody Price is a staff product engineer at ngrok.",
 		path: "/about",
+		pageType: "ProfilePage",
+		crumbs: [{ name: "About", path: "/about" }],
+		pageSchema: { mainEntity: { "@id": IDS.person } },
 	});
 
 export default function About() {

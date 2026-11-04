@@ -724,9 +724,18 @@ export function mountShrimpTank({
 	}
 
 	const headPosition = new Vector3();
-	// Why a fixed width: reading the bubble's width on each frame would force a layout.
+	const tailScreen = new Vector3();
+	/** The widest bubble, in CSS pixels. A fixed value: reading the bubble's width on each frame would force a layout. */
 	const speechMaxWidth = 260;
-	/** Moves the speech anchor to the head, so the bubble's tail points at him as he swims. */
+	/** How far the head must lead the tail on screen before the bubble changes sides, so a turn toward the camera never flips it back and forth. */
+	const flipLead = 12;
+	let speechSide: "left" | "right" = "right";
+	/**
+	 * Moves the speech anchor to the top of his head, just behind the eye, on
+	 * each frame. In a wide tank, the bubble sits on the side he faces, and moves
+	 * to the other side when it would cross the tank's edge. In a narrow tank, it
+	 * stays on the right.
+	 */
 	function placeSpeech() {
 		const [eye] = eyes;
 		if (eye == null) {
@@ -734,10 +743,33 @@ export function mountShrimpTank({
 		}
 		eye.getWorldPosition(headPosition);
 		headPosition.project(camera);
+		tail.getWorldPosition(tailScreen);
+		tailScreen.project(camera);
 		const x = ((headPosition.x + 1) / 2) * viewport.width;
 		const y = ((1 - headPosition.y) / 2) * viewport.height;
-		const left = MathUtils.clamp(x - 10, 0, Math.max(0, viewport.width - speechMaxWidth));
-		speech.style.transform = `translate3d(${left.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+		const lead = ((headPosition.x - tailScreen.x) / 2) * viewport.width;
+		// Why 6 px behind and 8 px up: the anchor is the top of his carapace, not the eye itself.
+		const anchorX = x - Math.sign(lead) * 6;
+		speech.style.transform = `translate3d(${anchorX.toFixed(1)}px, ${(y - 8).toFixed(1)}px, 0)`;
+		let side = speechSide;
+		if (viewport.width < speechMaxWidth * 2) {
+			// Why right in a narrow tank: a bubble overflows it on either side, and the inset tank of a
+			// post aside sits at the aside's left edge, so only the right side stays in the aside.
+			side = "right";
+		} else {
+			if (Math.abs(lead) > flipLead) {
+				side = lead > 0 ? "right" : "left";
+			}
+			if (side === "right" && anchorX + speechMaxWidth > viewport.width) {
+				side = "left";
+			} else if (side === "left" && anchorX - speechMaxWidth < 0) {
+				side = "right";
+			}
+		}
+		if (side !== speechSide) {
+			speechSide = side;
+			speech.dataset.side = side;
+		}
 	}
 	function spawnHearts(count: number) {
 		const [eye] = eyes;

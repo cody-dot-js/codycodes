@@ -9,7 +9,9 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import { SITE_NAME } from "./site.ts";
+import { SwimmingFavicon } from "./features/favicon/swimming-favicon.tsx";
+import { SITE_NAME, X_HANDLE } from "./site.ts";
+import { staleBuild } from "./stale-build.ts";
 
 import geistUrl from "@fontsource-variable/geist/wght.css?url";
 import jetbrainsMonoUrl from "@fontsource-variable/jetbrains-mono/wght.css?url";
@@ -19,9 +21,15 @@ export const links: Route.LinksFunction = () => [
 	{ rel: "stylesheet", href: geistUrl },
 	{ rel: "stylesheet", href: jetbrainsMonoUrl },
 	{ rel: "stylesheet", href: globalUrl },
-	{ rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+	{ rel: "icon", href: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+	{ rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
 	{ rel: "alternate", type: "application/rss+xml", title: SITE_NAME, href: "/rss.xml" },
+	{ rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
+	{ rel: "manifest", href: "/site.webmanifest" },
 ];
+
+/** Loads the target of a navigation as a document when the tab knows of a newer build. */
+export const clientMiddleware = [staleBuild.middleware];
 
 export function Layout({ children }: { children: ReactNode }) {
 	return (
@@ -30,6 +38,12 @@ export function Layout({ children }: { children: ReactNode }) {
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 				<meta name="theme-color" content="#02121a" />
+				{/* Why here: these tags are the same on every page. `pageMeta` writes the ones that differ. */}
+				<meta name="author" content={SITE_NAME} />
+				<meta property="og:site_name" content={SITE_NAME} />
+				<meta property="og:locale" content="en_US" />
+				<meta name="twitter:site" content={`@${X_HANDLE}`} />
+				<meta name="twitter:creator" content={`@${X_HANDLE}`} />
 				<Meta />
 				<Links />
 			</head>
@@ -43,7 +57,12 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-	return <Outlet />;
+	return (
+		<>
+			<SwimmingFavicon />
+			<Outlet />
+		</>
+	);
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

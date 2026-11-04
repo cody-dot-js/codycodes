@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { lineAfter } from "./lines.ts";
 import { SpeechBubble } from "./speech-bubble.tsx";
+import { SpeechTail } from "./speech-tail.tsx";
 
 /** Loads three.js and the scene in their own chunk. */
 async function loadScene() {
@@ -87,16 +88,21 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 					</span>
 				)}
 			</button>
-			{/* Why a zero-size anchor: the scene moves it to his head, and the bubble sits above it. */}
+			{/* Why a zero-size anchor: the scene moves it to the top of his head on each frame, and sets
+			    `data-side` to the side he faces. The bubble and its tail swing to that side. */}
 			<p
 				ref={speechRef}
 				aria-live="polite"
-				className="pointer-events-none absolute top-0 left-0 z-20 size-0 will-change-transform"
+				data-side="right"
+				className="group/speech pointer-events-none absolute top-0 left-0 z-20 size-0 will-change-transform"
 			>
 				{status === "ready" && (
-					<span className="absolute bottom-9 left-0 w-max">
-						<SpeechBubble>{line}</SpeechBubble>
-					</span>
+					<>
+						<SpeechTail className="absolute bottom-0 left-0 origin-bottom-left transition-transform duration-500 ease-out group-data-[side=left]/speech:-scale-x-100" />
+						<span className="absolute bottom-10 left-4 w-max transition-transform duration-500 ease-out group-data-[side=left]/speech:-translate-x-[calc(100%+2rem)]">
+							<SpeechBubble>{line}</SpeechBubble>
+						</span>
+					</>
 				)}
 			</p>
 		</div>

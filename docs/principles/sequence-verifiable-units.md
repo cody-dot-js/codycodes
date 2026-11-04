@@ -16,6 +16,5 @@ Split work into steps that each end in a state you can check. Finish and verify 
 **In this repo:**
 
 - [AGENTS.md § Before you finish](../../AGENTS.md#before-you-finish) sets when to run the checks.
-- The move to `@ngrok/app-server` follows the steps in [`docs/app-server.md`](../app-server.md). Finish and check each step before the next.
 
 **Enforced by:** review.

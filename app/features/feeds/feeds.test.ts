@@ -37,6 +37,13 @@ describe("llmsTxt", () => {
 });
 
 describe("sitemap", () => {
+	it("dates the home page and the post list by the newest change to a post", () => {
+		expect(sitemap(posts)).toContain("<loc>https://codycod.es/</loc><lastmod>2026-11-04</lastmod>");
+		expect(sitemap(posts)).toContain(
+			"<loc>https://codycod.es/posts</loc><lastmod>2026-11-04</lastmod>",
+		);
+	});
+
 	it("uses the update date as `lastmod` when a post has one", () => {
 		expect(sitemap(posts)).toContain(
 			"<loc>https://codycod.es/posts/tags-and-quotes</loc><lastmod>2026-11-04</lastmod>",

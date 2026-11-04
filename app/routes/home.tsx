@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { PostList } from "~/components/post-list.tsx";
 import { posts } from "~/features/posts/posts.server.ts";
 import { toSummaries } from "~/features/posts/summaries.ts";
+import { IDS } from "~/features/seo/json-ld.ts";
 import { pageMeta } from "~/features/seo/page-meta.ts";
 import { ShrimpTank } from "~/features/shrimp-tank/shrimp-tank.tsx";
 import { SITE_DESCRIPTION } from "~/site.ts";
@@ -14,7 +15,11 @@ export function loader() {
 }
 
 export const meta: Route.MetaFunction = () =>
-	pageMeta({ description: SITE_DESCRIPTION, path: "/" });
+	pageMeta({
+		description: SITE_DESCRIPTION,
+		path: "/",
+		pageSchema: { about: { "@id": IDS.person } },
+	});
 
 export default function Home({ loaderData }: Route.ComponentProps) {
 	return (

@@ -1,13 +1,21 @@
-import { Link } from "react-router";
+import { Link, data } from "react-router";
 
 import { pageMeta } from "~/features/seo/page-meta.ts";
 
 import type { Route } from "./+types/not-found";
 
-export const meta: Route.MetaFunction = () => [
-	...pageMeta({ title: "Not found", description: "This page does not exist.", path: "/404" }),
-	{ name: "robots", content: "noindex" },
-];
+// Why a loader: the server renders this page for each unknown URL, and it must answer 404, not 200.
+export function loader() {
+	return data(null, { status: 404 });
+}
+
+export const meta: Route.MetaFunction = () =>
+	pageMeta({
+		title: "Not found",
+		description: "This page does not exist.",
+		path: "/404",
+		noindex: true,
+	});
 
 export default function NotFound() {
 	return (

@@ -1,0 +1,13 @@
+{
+	"name": "Cody Price",
+	"short_name": "codycod.es",
+	"description": "Staff product engineer at ngrok. Frontend performance, design systems, and agent tooling.",
+	"start_url": "/",
+	"display": "browser",
+	"background_color": "#02121a",
+	"theme_color": "#02121a",
+	"icons": [
+		{ "src": "/favicon.ico", "sizes": "16x16 32x32 48x48", "type": "image/x-icon" },
+		{ "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+	]
+}

@@ -1,6 +1,6 @@
 # codycod.es agent guide
 
-Cody Price's personal site: MDX posts in the abyss brand, prerendered to static files with React Router 8. One package at the repo root, deployed on Vercel. It moves to `@ngrok/app-server` after that package ships 0.3.0 ([docs/app-server.md](./docs/app-server.md)).
+Cody Price's personal site: MDX posts in the abyss brand, built with React Router 8 and served by [`@ngrok/app-server`](https://github.com/ngrok/app-server). The build prerenders each known page. One package at the repo root, deployed on Vercel.
 
 This file follows the [AGENTS.md standard](https://agents.md) and is canonical for every harness. `CLAUDE.md` is a symlink to it; edit `AGENTS.md` only. Every task loads this file, so it holds only what every task needs. [Guard the context window](./docs/principles/guard-the-context-window.md) before you add to it.
 
@@ -11,9 +11,9 @@ Read the files for your task before the first edit. Work is incomplete until you
 - **Any code** (`app/`, `scripts/`, config, CI): [CONVENTIONS.md](./CONVENTIONS.md) in full.
 - **A post** (`content/`): [content/AGENTS.md](./content/AGENTS.md). A post that adds a component also follows the code rule.
 - **The frontmatter contract:** `app/features/posts/schema.ts`. Change the schema, then every post that it breaks, in one change.
-- **A redirect:** `app/redirects.ts` is the one table. Update `vercel.json` to match; `app/redirects.test.ts` fails when they drift.
+- **A redirect:** `app/redirects.ts` is the one table. `server.ts` gives it to the server.
 - **The shrimp tank or the header shrimp** (`app/features/shrimp-tank/`, `app/features/header-shrimp/`): [CONVENTIONS.md § Performance](./CONVENTIONS.md#performance). Each one loads its motion after the first paint, and its box keeps its size the whole time. The header shrimp is a port of the shrimpposting `templates/waves.js`; change both together.
-- **A host, a header, or a server feature:** [docs/app-server.md](./docs/app-server.md) first. Do not add a server-side workaround that the move to `@ngrok/app-server` deletes.
+- **A host, a header, or a server feature:** `server.ts` holds the request pipeline. Read the [`@ngrok/app-server` README](https://github.com/ngrok/app-server#readme) first, and use an option of `defaultPlugins` before you write a plugin.
 - **A custom lint rule:** `scripts/oxlint-rules/`, one file for each rule, with tests in `scripts/oxlint-plugin.test.ts`.
 - **A decision with trade-offs:** add a record in [docs/decisions/](./docs/decisions/).
 - **A change a person sees** (a page, a post, the brand): run the build and look at the page in a browser before you report done ([prove it works](./docs/principles/prove-it-works.md)).
@@ -46,7 +46,7 @@ Short, named rules for how to work. Each name links to its full rule. When you a
 - A comment says why, not what. Start it with `Why:` when it explains a choice.
 - Lint turns on every oxlint category. A rule goes off only in `.oxlintrc.json`, with a reason. A suppression comment also gives a reason: `// oxlint-disable-next-line <rule> -- <reason>`.
 - Check for no value with `== null` and `!= null`. Lint rejects `=== null`, `=== undefined`, and `== undefined`.
-- Every page is prerendered (`ssr: false`). A loader runs only at build time. Code that must run for each request waits for `@ngrok/app-server`.
+- The build prerenders each known page, so its loader runs at build time. The server renders only the other URLs, such as a 404. Put work for each request in `server.ts`, not in the loader of a prerendered page.
 - Tests assert behavior that a caller sees. A fix comes with a test that fails without it.
 
 ## Before you edit
