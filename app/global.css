@@ -173,3 +173,12 @@ html[data-over-shrimp="true"],
 html[data-over-shrimp="true"] * {
 	cursor: pointer;
 }
+
+/*
+ * The header shrimp: the art's ground is black, so the screen blend drops it, and the mask fades the
+ * edges into the page, as on the title cards.
+ */
+.header-shrimp :where(img, canvas) {
+	mix-blend-mode: screen;
+	mask-image: radial-gradient(ellipse 54% 50% at 52% 50%, black 58%, transparent 99%);
+}

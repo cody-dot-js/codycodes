@@ -12,7 +12,7 @@ Read the files for your task before the first edit. Work is incomplete until you
 - **A post** (`content/`): [content/AGENTS.md](./content/AGENTS.md). A post that adds a component also follows the code rule.
 - **The frontmatter contract:** `app/features/posts/schema.ts`. Change the schema, then every post that it breaks, in one change.
 - **A redirect:** `app/redirects.ts` is the one table. Update `vercel.json` to match; `app/redirects.test.ts` fails when they drift.
-- **The shrimp tank** (`app/features/shrimp-tank/`): [CONVENTIONS.md § Performance](./CONVENTIONS.md#performance). The scene loads after the first paint, and the tank keeps its size the whole time.
+- **The shrimp tank or the header shrimp** (`app/features/shrimp-tank/`, `app/features/header-shrimp/`): [CONVENTIONS.md § Performance](./CONVENTIONS.md#performance). Each one loads its motion after the first paint, and its box keeps its size the whole time. The header shrimp is a port of the shrimpposting `templates/waves.js`; change both together.
 - **A host, a header, or a server feature:** [docs/app-server.md](./docs/app-server.md) first. Do not add a server-side workaround that the move to `@ngrok/app-server` deletes.
 - **A custom lint rule:** `scripts/oxlint-rules/`, one file for each rule, with tests in `scripts/oxlint-plugin.test.ts`.
 - **A decision with trade-offs:** add a record in [docs/decisions/](./docs/decisions/).

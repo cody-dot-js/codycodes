@@ -81,7 +81,7 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 					</span>
 				)}
 			</button>
-			<p aria-live="polite" className="pointer-events-none absolute top-0 right-[6%] z-20">
+			<p aria-live="polite" className="pointer-events-none absolute top-[10%] left-[16%] z-20">
 				{status === "ready" && <SpeechBubble>{line}</SpeechBubble>}
 			</p>
 		</div>

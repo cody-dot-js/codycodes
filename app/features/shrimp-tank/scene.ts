@@ -937,7 +937,8 @@ export function mountShrimpTank({
 		const shrimpX = rect.left + ((headPosition.x + 1) / 2) * rect.width;
 		const shrimpY = rect.top + ((1 - headPosition.y) / 2) * rect.height;
 		cursor.near = Math.hypot(event.clientX - shrimpX, event.clientY - shrimpY) < FOLLOW_RADIUS;
-		if (cursor.near) {
+		// Why hold still while the cursor is on him: a shrimp that slides away from the cursor is hard to pet.
+		if (cursor.near && !over) {
 			// Why stop short: he swims toward the cursor, not onto it, and stays inside his tank.
 			cursor.x = MathUtils.clamp(pointer.x * 2.4 * 0.7, -1.6, 1.6);
 			cursor.y = MathUtils.clamp(pointer.y * 0.9 * 0.7, -0.45, 0.45);
