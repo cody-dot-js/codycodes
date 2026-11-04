@@ -13,9 +13,9 @@ video: /posts/keep-the-tail/card.mp4
 import { Btw } from "~/components/mdx/btw.tsx";
 import { LiveDemo } from "~/components/mdx/live-demo.tsx";
 
-Put three endpoint IDs in a narrow column with `text-overflow: ellipsis`, and all three read `ep_2abcdEFGhijKL…`. The ellipsis eats the end of each ID, and the end is the only part that tells them apart.
+Put three endpoint IDs in a narrow column with [`text-overflow: ellipsis`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-overflow), and all three read `ep_2abcdEFGhijKL…`. The ellipsis eats the end of each ID, and the end is the only part that tells them apart.
 
-[mantle](https://mantle.ngrok.com), ngrok's React component library, has a component for this now. `TruncatedText` clips the middle and keeps the tail. Here are the same three IDs both ways, rendered by the real component:
+[mantle](https://mantle.ngrok.com), ngrok's React component library, has a component for this now. [`TruncatedText`](https://mantle.ngrok.com/components/data-display/truncated-text/) clips the middle and keeps the tail. Here are the same three IDs both ways, rendered by the real component:
 
 <LiveDemo
   src="/posts/keep-the-tail/demo"
@@ -30,41 +30,59 @@ In the right-hand column, try these:
 - Hover a clipped ID, or Tab to it, to read the whole value in a tooltip.
 
 <Btw>
-  The frame runs `@ngrok/mantle` 0.93.7 from npm, not a copy of it. mantle is [open
-  source](https://github.com/ngrok/mantle) under the MIT license.
+  The frame runs [`@ngrok/mantle`](https://www.npmjs.com/package/@ngrok/mantle) 0.93.7 from npm, not
+  a copy of it. mantle is [open source](https://github.com/ngrok/mantle) under the MIT license.
 </Btw>
 
 ## Use it
 
+The tail is the part that tells two values apart in more than IDs. In each pair below, only the end differs:
+
+- A URL differs in its last path segment or its query, so keep about 10 characters.
+- An image reference differs in its tag. [`asChild`](https://mantle.ngrok.com/components/data-display/truncated-text/#polymorphism) renders the value inside your own [`<code>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/code).
+- A file path differs in its file name, so set [`tail`](https://mantle.ngrok.com/components/data-display/truncated-text/#tail-length) to the length of the names you show.
+- An ID with a type prefix reads best as `mem_…A8KImPbQ`. [`head`](https://mantle.ngrok.com/components/data-display/truncated-text/#head-length) keeps the prefix too.
+
+<LiveDemo
+  src="/posts/keep-the-tail/demo-values"
+  title="A URL, an image reference, a file path, and a prefixed ID under CSS truncate and under TruncatedText"
+  height={400}
+  start="wide"
+/>
+
 ```tsx
 import { TruncatedText } from "@ngrok/mantle/truncated-text";
 
-// Keep the six characters that tell two IDs apart.
 <TruncatedText tail={6} value="ep_2abcdEFGhijKL123456" />
-
-// Keep the type prefix too: mem_…A8KImPbQ
+<TruncatedText tail={10} value="https://example.ngrok.app/api/items?filter=…&limit=200" />
+<TruncatedText asChild tail={12} value="ghcr.io/ngrok/ngrok-operator:0.14.0-rc.2">
+  <code />
+</TruncatedText>
+<TruncatedText tail={18} value="packages/mantle/src/components/truncated-text/truncated-text.tsx" />
 <TruncatedText head={4} value="mem_21h80N9qQuAmhSB8nlTA8KImPbQ" />
 ```
 
-`tail` defaults to 8, enough for the last path segment of most URLs. It counts graphemes, not characters, so an emoji or a letter with a combining accent never splits in half.
+`tail` defaults to 8. It counts graphemes, not characters, so an emoji or a letter with a combining accent never splits in half.
+
+Skip it for prose that can lose its end: plain [`text-overflow: ellipsis`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-overflow) is right there. Skip it for a value that may wrap to a second line too. Let that one wrap.
 
 ## How it clips
 
-`TruncatedText` splits the value with `Intl.Segmenter` and renders the two parts as inline-block spans. The head clips with a plain CSS ellipsis and takes whatever width the tail leaves. A `ResizeObserver` measures both on mount and on every resize. Only a value that overflows gets a `data-truncated` attribute, a tab stop, and a tooltip. A value that fits renders as plain text.
+[`TruncatedText`](https://mantle.ngrok.com/components/data-display/truncated-text/) splits the value with [`Intl.Segmenter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter) and renders the two parts as inline-block spans. The head clips with a plain CSS ellipsis and takes whatever width the tail leaves. A [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) measures both on mount and on every resize. Only a value that overflows gets a [`data-truncated`](https://mantle.ngrok.com/components/data-display/truncated-text/#data-attributes) attribute, a tab stop, and a tooltip. A value that fits renders as plain text.
 
-In a monospace font, the head's width rounds down to whole `ch` cells, so the last clipped glyph, the ellipsis, and the tail sit flush. Ligatures are off too. A `//` that shapes into one glyph would otherwise lose both slashes to a single clip.
+In a monospace font, the head's width rounds down to whole [`ch`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length#ch) cells, so the last clipped glyph, the ellipsis, and the tail sit flush. [Ligatures](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-variant-ligatures) are off too. A `//` that shapes into one glyph would otherwise lose both slashes to a single clip.
 
 ## Why not flex
 
 [The issue](https://github.com/ngrok/mantle/issues/1549) proposed flex: a row with a head that shrinks and a tail that doesn't. It lays out fine, and it copies wrong. Chromium and WebKit put a newline between two flex items when they serialize a selection, so a copied ID pasted as two lines.
 
-Two inline-block spans copy as one line in Chromium, Firefox, and WebKit. I measured all three through Playwright before I picked the layout. `user-select: all` on the root selects the whole value in one click, and CSS draws the ellipsis, so it never lands in what you copy.
+Two inline-block spans copy as one line in Chromium, Firefox, and WebKit. I measured all three through Playwright before I picked the layout. [`user-select: all`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/user-select) on the root selects the whole value in one click, and CSS draws the ellipsis, so it never lands in what you copy.
 
 ## What a screen reader hears
 
 Inline-block fixed the copy and broke the accessible name. Chromium puts a space between two inline-block boxes when it builds a name, so a screen reader announced the ID as two strings.
 
-So the two visible halves are `aria-hidden`, and a visually hidden span holds the whole value as one text node. A clipped ID renders like this, with the classes left out:
+So the two visible halves are [`aria-hidden`](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-hidden), and a visually hidden span holds the whole value as one text node. A clipped ID renders like this, with the classes left out:
 
 ```html
 <span data-slot="truncated-text" data-truncated tabindex="0" translate="no" dir="ltr">
@@ -76,7 +94,7 @@ So the two visible halves are `aria-hidden`, and a visually hidden span holds th
 </span>
 ```
 
-The hidden copy has `user-select: none`, so one click still copies the value once, not twice. `translate="no"` keeps a browser's translate feature away from a value you're meant to copy.
+The hidden copy has [`user-select: none`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/user-select), so one click still copies the value once, not twice. [`translate="no"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/translate) keeps a browser's translate feature away from a value you're meant to copy.
 
 <Btw>
   Browser translation rewrites the page's text nodes behind React's back. React has had an [open
@@ -86,8 +104,8 @@ The hidden copy has `user-select: none`, so one click still copies the value onc
 
 ## What it costs
 
-Every instance runs its own `ResizeObserver`. A paged list of 20 IDs runs 20 observers. A table that renders every row runs one per row, so page a long table or virtualize it.
+Every instance runs its own [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver). A paged list of 20 IDs runs 20 observers. A table that renders every row runs one per row, so page a long table or virtualize it.
 
-An auto-layout table also grows its column to fit the whole value, which defeats the clip. Set `table-layout: fixed` on the table and give it a width.
+An auto-layout table also grows its column to fit the whole value, which defeats the clip. Set [`table-layout: fixed`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/table-layout) on the table and give it a width.
 
-`TruncatedText` shipped in mantle 0.89.0 on October 14. The [docs](https://mantle.ngrok.com/components/data-display/truncated-text) cover `head`, `asChild`, and styling each half, and [mantle#1550](https://github.com/ngrok/mantle/pull/1550) has the browser measurements behind the layout.
+[`TruncatedText`](https://mantle.ngrok.com/components/data-display/truncated-text/) shipped in mantle 0.89.0 on October 14. The [docs](https://mantle.ngrok.com/components/data-display/truncated-text) cover [`head`](https://mantle.ngrok.com/components/data-display/truncated-text/#head-length), [`asChild`](https://mantle.ngrok.com/components/data-display/truncated-text/#polymorphism), and styling each half, and [mantle#1550](https://github.com/ngrok/mantle/pull/1550) has the browser measurements behind the layout.

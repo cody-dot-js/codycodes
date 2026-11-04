@@ -123,6 +123,17 @@
 		color: var(--color-label);
 	}
 
+	/* Why: a link to an API's docs keeps the code color, and its underline shows that it is a link. */
+	& a:has(> code) {
+		color: var(--color-label);
+		text-decoration-color: rgb(169 200 209 / 0.5);
+
+		&:hover {
+			color: var(--color-ink);
+			text-decoration-color: currentColor;
+		}
+	}
+
 	& :not(pre) > code {
 		font-family: var(--font-mono);
 		font-size: 0.88em;

@@ -88,6 +88,7 @@ export function pageMeta({
 			? []
 			: [
 					{ property: "og:video", content: absoluteUrl(video) },
+					{ property: "og:video:secure_url", content: absoluteUrl(video) },
 					{ property: "og:video:type", content: "video/mp4" },
 					{ property: "og:video:width", content: "1280" },
 					{ property: "og:video:height", content: "720" },

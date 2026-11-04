@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { globSync } from "node:fs";
+import { basename } from "node:path";
 
 import type { RouteConfig } from "@react-router/dev/routes";
 import { index, layout, route } from "@react-router/dev/routes";
@@ -30,13 +31,14 @@ export default [
 			: []),
 		route("*", "routes/not-found.tsx"),
 	]),
-	// Why outside the site layout: a post embeds its demo in a frame, so the demo has no site chrome.
-	...postFiles.flatMap((post) => {
-		const demo = post.file.replace(/post\.mdx$/u, "demo.tsx");
-		return existsSync(demo)
-			? [route(`posts/${post.slug}/demo`, `../${demo}`, { id: `post-demo/${post.slug}` })]
-			: [];
-	}),
+	// Why outside the site layout: a post embeds its demos in frames, so a demo has no site chrome.
+	// Each `demo*.tsx` next to a post is a page at `/posts/<slug>/<file name>`.
+	...postFiles.flatMap((post) =>
+		globSync(post.file.replace(/post\.mdx$/u, "demo*.tsx")).map((file) => {
+			const name = basename(file, ".tsx");
+			return route(`posts/${post.slug}/${name}`, `../${file}`, { id: `post-${name}/${post.slug}` });
+		}),
+	),
 	...postFiles.map((post) =>
 		route(`posts/${post.slug}.md`, "routes/post-markdown.ts", { id: `post-markdown/${post.slug}` }),
 	),
