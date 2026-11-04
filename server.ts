@@ -1,6 +1,8 @@
 import { createServer, defaultPlugins, withHeaderHook } from "@ngrok/app-server";
 import type { Plugin } from "@ngrok/app-server";
 
+import { CONTRIBUTIONS_PATH } from "./app/features/github-squares/calendar.ts";
+import { fetchContributions } from "./app/features/github-squares/contributions.server.ts";
 import { REDIRECTS } from "./app/redirects.ts";
 
 /** Turns off the browser features that no page here uses. `securityHeaders` has no option for this header. */
@@ -36,7 +38,7 @@ function documentPolicy(scriptSrc: string) {
 	].join("; ");
 }
 
-export default createServer({
+const server = createServer({
 	plugins: defaultPlugins({
 		redirects: REDIRECTS,
 		// Why preview only: a preview deploy must stay out of search. Production and a local serve do not.
@@ -51,3 +53,13 @@ export default createServer({
 		beforeStatic: [permissionsPolicy],
 	}),
 });
+
+// Why a server route: the home page is prerendered at deploy time, and the squares change each day.
+// The CDN keeps one copy for 10 minutes, so GitHub gets at most a few requests an hour.
+server.get(CONTRIBUTIONS_PATH, async (context) =>
+	context.json(await fetchContributions(), 200, {
+		"Cache-Control": "public, max-age=0, s-maxage=600, stale-while-revalidate=3600",
+	}),
+);
+
+export default server;

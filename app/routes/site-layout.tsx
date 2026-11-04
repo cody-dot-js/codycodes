@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet } from "react-router";
 import { DitherOcean } from "~/features/dither-ocean/dither-ocean.tsx";
 import { FootnoteMotion } from "~/features/footnotes/footnote-motion.tsx";
 import { HeaderShrimp } from "~/features/header-shrimp/header-shrimp.tsx";
-import { X_HANDLE } from "~/site.ts";
+import { GITHUB_HANDLE, X_HANDLE } from "~/site.ts";
 
 export default function SiteLayout() {
 	return (
@@ -39,7 +39,7 @@ export default function SiteLayout() {
 						<a href={`https://x.com/${X_HANDLE}`} className="hover:text-ink">
 							@{X_HANDLE}
 						</a>
-						<a href="https://github.com/cody-dot-js" className="hover:text-ink">
+						<a href={`https://github.com/${GITHUB_HANDLE}`} className="hover:text-ink">
 							github
 						</a>
 						<a href="/rss.xml" className="hover:text-ink">

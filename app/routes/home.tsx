@@ -1,6 +1,8 @@
 import { Link } from "react-router";
 
 import { PostList } from "~/components/post-list.tsx";
+import { fetchContributions } from "~/features/github-squares/contributions.server.ts";
+import { GithubSquares } from "~/features/github-squares/github-squares.tsx";
 import { posts } from "~/features/posts/posts.server.ts";
 import { toSummaries } from "~/features/posts/summaries.ts";
 import { IDS } from "~/features/seo/json-ld.ts";
@@ -10,8 +12,9 @@ import { SITE_DESCRIPTION } from "~/site.ts";
 
 import type { Route } from "./+types/home";
 
-export function loader() {
-	return { latest: toSummaries(posts.slice(0, 5)) };
+// Why at build time too: the prerendered squares show at once, and the page then gets the fresh ones.
+export async function loader() {
+	return { latest: toSummaries(posts.slice(0, 5)), contributions: await fetchContributions() };
 }
 
 export const meta: Route.MetaFunction = () =>
@@ -47,6 +50,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 					</Link>
 				</div>
 				<PostList posts={loaderData.latest} empty="The first post is on its way." />
+			</section>
+			<section className="grid gap-5">
+				<h2 className="text-2xl font-semibold tracking-tight">Pink squares</h2>
+				<GithubSquares initialDays={loaderData.contributions} />
 			</section>
 		</div>
 	);
