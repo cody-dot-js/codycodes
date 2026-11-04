@@ -2,26 +2,33 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { BAYER_4, HEART } from "~/features/dither/dither.ts";
 
-import calmUrl from "./nug-calm.png";
-import happyUrl from "./nug-happy.png";
+import calm176 from "./nug-calm-176.png";
+import calm88 from "./nug-calm-88.png";
+import happy176 from "./nug-happy-176.png";
+import happy88 from "./nug-happy-88.png";
+
+/** The frames for each size. Each is dithered at its own size, so the dots stay one pixel each. */
+const FRAMES = {
+	88: { calm: calm88, happy: happy88 },
+	176: { calm: calm176, happy: happy176 },
+} as const;
 
 /** How long one heart floats, and how long his eyes stay shut after a pet, in milliseconds. */
 const PET_MS = 1400;
-/** The heart canvas, in cells of 2 CSS px, the cell size of the 3D shrimp's hearts. */
-const GRID = 88;
-/** His thumb tip in that grid: each heart floats up from here. */
-const THUMB = { x: 18, y: 38 } as const;
-/** How far a heart rises, in cells. */
-const HEART_RISE = 14;
+/** His thumb tip, as a share of his width and height: each heart floats up from here. */
+const THUMB = { x: 0.205, y: 0.43 } as const;
+/** How far a heart rises, as a share of his height. */
+const HEART_RISE = 0.16;
 
 /** Draws the heart of each fresh pet, risen and dithered away by its age. */
 function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: number) {
-	context.clearRect(0, 0, GRID, GRID);
+	const grid = context.canvas.width;
+	context.clearRect(0, 0, grid, grid);
 	context.fillStyle = "#ffb1aa";
 	for (const start of pets) {
 		const progress = (now - start) / PET_MS;
-		const top = Math.round(THUMB.y - 7 - progress * HEART_RISE);
-		const left = Math.round(THUMB.x - 3 + Math.sin(progress * Math.PI * 2) * 1.5);
+		const top = Math.round(THUMB.y * grid - 7 - progress * HEART_RISE * grid);
+		const left = Math.round(THUMB.x * grid - 3 + Math.sin(progress * Math.PI * 2) * 1.5);
 		for (const [row, cells] of HEART.entries()) {
 			for (let column = 0; column < cells.length; column++) {
 				// Why Bayer order: the heart dithers away like the 3D shrimp's hearts, not with a plain fade.
@@ -40,12 +47,13 @@ function drawHearts(context: CanvasRenderingContext2D, pets: number[], now: numb
  * Nug: the shrimp in the ngrok hoodie, dithered in the site's shell and abyss
  * colors. A pet (a click, or Enter on the focused button) shuts his eyes in a
  * happy `^ ^` and floats a pixel heart up from his thumb. Both faces are in
- * the HTML, so the first pet shows at once.
+ * the HTML, so the first pet shows at once. The heart's cells are 2 CSS px, as
+ * the 3D shrimp's are, so its canvas holds half his size.
  *
  * @example
- * <Nug className="size-44" />
+ * <Nug size={176} className="justify-self-center" />
  */
-export function Nug({ className }: { className: string }) {
+export function Nug({ size, className }: { size: 88 | 176; className: string }) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const pets = useRef<number[]>([]);
 	const play = useRef<(() => void) | null>(null);
@@ -92,28 +100,28 @@ export function Nug({ className }: { className: string }) {
 			type="button"
 			aria-label="Pet Nug"
 			onClick={pet}
-			className={`nug relative block ${className}`}
+			className={`nug relative block shrink-0 ${className}`}
 		>
 			<img
-				src={calmUrl}
+				src={FRAMES[size].calm}
 				alt=""
-				width={176}
-				height={176}
+				width={size}
+				height={size}
 				hidden={happy}
-				className="size-full [image-rendering:pixelated]"
+				className="block [image-rendering:pixelated]"
 			/>
 			<img
-				src={happyUrl}
+				src={FRAMES[size].happy}
 				alt=""
-				width={176}
-				height={176}
+				width={size}
+				height={size}
 				hidden={!happy}
-				className="size-full [image-rendering:pixelated]"
+				className="block [image-rendering:pixelated]"
 			/>
 			<canvas
 				ref={canvasRef}
-				width={GRID}
-				height={GRID}
+				width={size / 2}
+				height={size / 2}
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-0 size-full [image-rendering:pixelated]"
 			/>

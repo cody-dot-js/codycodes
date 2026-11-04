@@ -48,7 +48,7 @@ export function NgrokCta({ title, children }: { title: string; children: ReactNo
 					</a>
 				</p>
 			</div>
-			<Nug className="relative order-first size-44 justify-self-center sm:order-none sm:self-end" />
+			<Nug size={176} className="order-first justify-self-center sm:order-none sm:self-end" />
 		</aside>
 	);
 }
