@@ -31,6 +31,7 @@ import {
 	GLOW_VERTEX_SHADER,
 	VERTEX_SHADER,
 } from "./shaders.ts";
+import { BAYER_4, HEART } from "~/features/dither/dither.ts";
 
 const TAU = Math.PI * 2;
 /** The most laps that clicks can queue. */
@@ -44,17 +45,6 @@ export type ShrimpTankEvents = {
 
 /** CSS px from the shrimp at which he notices the cursor and swims toward it. */
 const FOLLOW_RADIUS = 260;
-
-/** The heart the pets make, as rows of cells. Why 7×6: it reads as a heart at 2 px cells. */
-const HEART = [".##.##.", "#######", "#######", ".#####.", "..###..", "...#..."] as const;
-
-/** A 4×4 Bayer matrix, so a heart fades out in the same ordered dither as the bubbles. */
-const BAYER_4 = [
-	[0, 8, 2, 10],
-	[12, 4, 14, 6],
-	[3, 11, 1, 9],
-	[15, 7, 13, 5],
-] as const;
 
 /** True when a click lands on a link, a button, or a field, which the shrimp must not take. */
 function isInteractive(target: EventTarget | null): boolean {

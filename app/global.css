@@ -89,7 +89,8 @@
 		letter-spacing: -0.01em;
 	}
 
-	& a {
+	/* Why no class: a markdown link has none. A component's link, such as a button, keeps its own style. */
+	& a:not([class]) {
 		color: var(--color-blush);
 		text-decoration: underline;
 		text-underline-offset: 3px;
@@ -124,7 +125,7 @@
 	}
 
 	/* Why: a link to an API's docs keeps the code color, and its underline shows that it is a link. */
-	& a:has(> code) {
+	& a:not([class]):has(> code) {
 		color: var(--color-label);
 		text-decoration-color: rgb(169 200 209 / 0.5);
 
@@ -221,5 +222,18 @@ html[data-over-shrimp="true"] * {
 @media (prefers-reduced-motion: no-preference) {
 	.speech-tail {
 		animation: speech-tail-flow 0.9s linear infinite;
+	}
+}
+
+/* Nug bobs in two steps, like a sprite. Still with reduced motion. */
+@keyframes nug-bob {
+	50% {
+		translate: 0 -2px;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.nug canvas {
+		animation: nug-bob 1.6s steps(1) infinite;
 	}
 }

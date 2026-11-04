@@ -12,6 +12,7 @@ video: /posts/keep-the-tail/card.mp4
 
 import { Btw } from "~/components/mdx/btw.tsx";
 import { LiveDemo } from "~/components/mdx/live-demo.tsx";
+import { NgrokCta } from "~/components/mdx/ngrok-cta.tsx";
 
 Put three endpoint IDs in a narrow column with [`text-overflow: ellipsis`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-overflow), and all three read `ep_2abcdEFGhijKL…`. The ellipsis eats the end of each ID, and the end is the only part that tells them apart.
 
@@ -36,7 +37,7 @@ In the right-hand column, try these:
 
 ## Use it
 
-The tail is the part that tells two values apart in more than IDs. In each pair below, only the end differs:
+IDs aren't the only values that differ at the end. In each pair below, only the end changes:
 
 - A URL differs in its last path segment or its query, so keep about 10 characters.
 - An image reference differs in its tag. [`asChild`](https://mantle.ngrok.com/components/data-display/truncated-text/#polymorphism) renders the value inside your own [`<code>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/code).
@@ -64,7 +65,7 @@ import { TruncatedText } from "@ngrok/mantle/truncated-text";
 
 `tail` defaults to 8. It counts graphemes, not characters, so an emoji or a letter with a combining accent never splits in half.
 
-Skip it for prose that can lose its end: plain [`text-overflow: ellipsis`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-overflow) is right there. Skip it for a value that may wrap to a second line too. Let that one wrap.
+Prose that can lose its end doesn't need it: plain [`text-overflow: ellipsis`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-overflow) covers that. A value that may wrap to a second line doesn't either. Let it wrap.
 
 ## How it clips
 
@@ -109,3 +110,8 @@ Every instance runs its own [`ResizeObserver`](https://developer.mozilla.org/en-
 An auto-layout table also grows its column to fit the whole value, which defeats the clip. Set [`table-layout: fixed`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/table-layout) on the table and give it a width.
 
 [`TruncatedText`](https://mantle.ngrok.com/components/data-display/truncated-text/) shipped in mantle 0.89.0 on October 14. The [docs](https://mantle.ngrok.com/components/data-display/truncated-text) cover [`head`](https://mantle.ngrok.com/components/data-display/truncated-text/#head-length), [`asChild`](https://mantle.ngrok.com/components/data-display/truncated-text/#polymorphism), and styling each half, and [mantle#1550](https://github.com/ngrok/mantle/pull/1550) has the browser measurements behind the layout.
+
+<NgrokCta title="See it in the ngrok dashboard">
+  The ngrok dashboard shows endpoint, agent, domain, and vault IDs with `TruncatedText`. Open it to
+  see the tails on your own resources, or sign up for free and get your first endpoint online.
+</NgrokCta>
