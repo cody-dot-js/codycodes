@@ -45,8 +45,7 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 		if (tank == null || bubbles == null || speech == null) {
 			return;
 		}
-		let dispose: (() => void) | undefined;
-		let unmounted = false;
+		const controller = new AbortController();
 		async function mount(target: {
 			tank: HTMLButtonElement;
 			bubbles: HTMLCanvasElement;
@@ -60,7 +59,7 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 				setStatus("no-webgl");
 				return;
 			}
-			if (unmounted) {
+			if (controller.signal.aborted) {
 				return;
 			}
 			const scene = sceneModule.mountShrimpTank({
@@ -72,13 +71,14 @@ export function ShrimpTank({ says, className }: { says?: string; className: stri
 					}
 				},
 			});
-			dispose = scene?.dispose;
+			if (scene != null) {
+				controller.signal.addEventListener("abort", scene.dispose, { once: true });
+			}
 			setStatus(scene == null ? "no-webgl" : "ready");
 		}
 		void mount({ tank, bubbles, speech });
 		return () => {
-			unmounted = true;
-			dispose?.();
+			controller.abort();
 		};
 	}, []);
 
