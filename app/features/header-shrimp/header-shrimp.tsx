@@ -26,14 +26,14 @@ export function HeaderShrimp({ className }: { className: string }) {
 		if (body == null || wisps == null) {
 			return;
 		}
-		let stop: (() => void) | undefined;
-		let unmounted = false;
+		const controller = new AbortController();
 		async function start(images: { body: HTMLImageElement; wisps: HTMLImageElement }) {
 			try {
 				await Promise.all([images.body.decode(), images.wisps.decode()]);
 				const swim = await loadSwim();
-				if (!unmounted) {
-					stop = swim.mountHeaderShrimp(images);
+				if (!controller.signal.aborted) {
+					const stop = swim.mountHeaderShrimp(images);
+					controller.signal.addEventListener("abort", stop, { once: true });
 				}
 			} catch {
 				// Why ignore a failure: the stills already show, so a failed decode or chunk loses only the motion.
@@ -41,8 +41,7 @@ export function HeaderShrimp({ className }: { className: string }) {
 		}
 		void start({ body, wisps });
 		return () => {
-			unmounted = true;
-			stop?.();
+			controller.abort();
 		};
 	}, []);
 

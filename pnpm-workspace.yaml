@@ -4,10 +4,16 @@
 # within an hour.
 # see: https://pnpm.io/settings#minimumreleaseage
 minimumReleaseAge: 360
-# Why: Cody publishes @ngrok/app-server, and this site adopts each release the day it ships.
-# Only the exact version skips the wait.
+# Why: match the frontend repo. These packages come from trusted publishers,
+# and the site adopts each release the day it ships.
 minimumReleaseAgeExclude:
-  - "@ngrok/app-server@0.3.0"
+  - "@ngrok/app-server"
+  - "@ngrok/mantle"
+  - "@types/react-dom"
+  - "@types/react"
+  - "react-dom"
+  - "react"
+  - "typescript"
 
 # Don't let pnpm switch itself to package.json#packageManager or record its own
 # version in pnpm-lock.yaml. mise and pnpm/action-setup already pin the version.
