@@ -6,7 +6,7 @@ Agents: start at [AGENTS.md](./AGENTS.md).
 
 ## Setup
 
-The repo pins Node and pnpm with [mise](https://mise.jdx.dev). `./scripts/install-mise` installs mise if you do not have it.
+The repo pins Node, pnpm, ast-grep, and ripgrep with [mise](https://mise.jdx.dev). `./scripts/install-mise` installs mise if you do not have it.
 
 ```sh
 mise install
