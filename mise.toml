@@ -1,10 +1,8 @@
 [settings]
 # Commit mise.lock so the toolchain is reproducible across machines.
 lockfile = true
-# Lock only the platforms that run this repo. The default set adds musl (Alpine),
-# and Node publishes musl builds after the official release, so a new Node pin
-# locks with no checksum.
-lockfile_platforms = ["linux-x64", "linux-arm64", "macos-arm64", "macos-x64", "windows-x64"]
+# Why: the repo runs only on an Apple silicon Mac and on GitHub's ubuntu-latest.
+lockfile_platforms = ["macos-arm64", "linux-x64"]
 # Read Node from .nvmrc. pnpm is configured below via package.json#packageManager.
 idiomatic_version_file_enable_tools = ["node"]
 # Check aqua downloads against the sha256 in mise.lock only. Attestation lookups
